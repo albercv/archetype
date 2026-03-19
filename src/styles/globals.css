@@ -88,6 +88,35 @@ body {
   background: var(--void);
 }
 
+/* ─── Point light / flashlight effect ──────────────────────── */
+.point-light {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  --px: 50%;
+  --py: 50%;
+  --pr: 350px;
+  --po: 0;
+  background: radial-gradient(
+    circle var(--pr) at var(--px) var(--py),
+    rgba(240, 237, 230, var(--po)),
+    transparent
+  );
+}
+
+@media (max-width: 768px) {
+  .point-light {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .point-light {
+    display: none;
+  }
+}
+
 /* ─── SECTION 1 — Hero ──────────────────────────────────────── */
 .lp-hero {
   position: relative;

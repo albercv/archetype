@@ -61,6 +61,7 @@ interface Particle {
 
 export function LandingPage() {
   const rootRef = useRef<HTMLDivElement>(null)
+  const lightRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const charRefs = useRef<Array<HTMLSpanElement | null>>(new Array(Q_LEN).fill(null))
@@ -306,8 +307,75 @@ export function LandingPage() {
     return () => ctx.revert()
   }, [reduced])
 
+  // ── Point light / flashlight effect ─────────────────────────
+  useEffect(() => {
+    if (isMobile || reduced) return
+    const light = lightRef.current
+    if (!light) return
+
+    let mx = 0, my = 0
+    let cx = 0, cy = 0
+    let cr = 350, co = 0
+    let hasMoved = false
+    let nearInteractive = false
+    let raf: number
+
+    const onMove = (e: MouseEvent) => {
+      mx = e.clientX
+      my = e.clientY
+      if (!hasMoved) hasMoved = true
+    }
+
+    const getTarget = (): { r: number; o: number } => {
+      if (!hasMoved) return { r: 350, o: 0 }
+      if (nearInteractive) return { r: 500, o: 0.1 }
+      const s2 = section2Ref.current?.getBoundingClientRect()
+      const s3 = section3Ref.current?.getBoundingClientRect()
+      const inContent =
+        (s2 && my >= s2.top && my <= s2.bottom) ||
+        (s3 && my >= s3.top && my <= s3.bottom)
+      return inContent ? { r: 300, o: 0.04 } : { r: 400, o: 0.08 }
+    }
+
+    const tick = () => {
+      cx += (mx - cx) * 0.1
+      cy += (my - cy) * 0.1
+      const { r: tr, o: to } = getTarget()
+      cr += (tr - cr) * 0.12
+      co += (to - co) * 0.12
+      light.style.setProperty('--px', `${cx}px`)
+      light.style.setProperty('--py', `${cy}px`)
+      light.style.setProperty('--pr', `${Math.round(cr)}px`)
+      light.style.setProperty('--po', co.toFixed(4))
+      raf = requestAnimationFrame(tick)
+    }
+
+    const onEnter = () => { nearInteractive = true }
+    const onLeave = () => { nearInteractive = false }
+    const interactives = document.querySelectorAll('.archetype-item, .s2-card')
+    interactives.forEach((el) => {
+      el.addEventListener('mouseenter', onEnter)
+      el.addEventListener('mouseleave', onLeave)
+    })
+
+    document.addEventListener('mousemove', onMove)
+    raf = requestAnimationFrame(tick)
+
+    return () => {
+      document.removeEventListener('mousemove', onMove)
+      cancelAnimationFrame(raf)
+      interactives.forEach((el) => {
+        el.removeEventListener('mouseenter', onEnter)
+        el.removeEventListener('mouseleave', onLeave)
+      })
+    }
+  }, [isMobile, reduced])
+
   return (
     <div ref={rootRef} className="lp-root">
+      {/* Point light — desktop only, pointer-events: none */}
+      <div ref={lightRef} className="point-light" aria-hidden="true" />
+
       {/* ── SECTION 1: The Hook ──────────────────────────── */}
       <section ref={heroRef} className="lp-hero">
         <canvas
