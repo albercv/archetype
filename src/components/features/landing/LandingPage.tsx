@@ -38,8 +38,8 @@ const CARDS = [
 type PhraseAlign = 'left' | 'right' | 'center'
 
 const PHRASES: { text: string; align: PhraseAlign; color: string }[] = [
-  { text: 'DETERMINA CÓMO LIDERAS', align: 'left', color: '#F0EDE6' },
-  { text: 'CÓMO AMAS', align: 'right', color: '#F0EDE6' },
+  { text: 'DETERMINA CÓMO LIDERAS', align: 'left', color: '#FFFFFF' },
+  { text: 'CÓMO AMAS', align: 'right', color: '#FFFFFF' },
   { text: 'CÓMO DESTRUYES', align: 'center', color: '#FF8C00' },
   { text: 'Y CÓMO TE DESTRUYES\nA TI MISMO', align: 'center', color: '#555555' },
 ]

@@ -280,15 +280,16 @@ body {
 /* ─── SECTION 3 — Archetypes ────────────────────────────────── */
 .lp-s3 {
   padding: 6rem 2rem 5rem;
+  border-top: 1px solid rgba(164, 140, 122, 0.2);
 }
 
 .s3-title {
   font-family: var(--font-space), sans-serif;
   font-weight: 700;
-  font-size: clamp(2rem, 6vw, 5rem);
+  font-size: clamp(2.3rem, 6.9vw, 5.75rem);
   letter-spacing: -0.02em;
   line-height: 1.05;
-  color: var(--text-primary);
+  color: #ffffff;
   text-align: left;
   margin-bottom: 3rem;
   padding-left: 0.5rem;
@@ -298,15 +299,14 @@ body {
 .lp-archetype-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--void);
-  margin-bottom: 3rem;
+  gap: 1rem;
+  margin-bottom: 4rem;
 }
 
 .archetype-item {
   background: var(--surface-low);
-  min-height: 130px;
-  border: 1px solid transparent;
+  min-height: 250px;
+  border: 1px solid rgba(164, 140, 122, 0.45);
   transition: border-color 0.2s ease, transform 0.2s ease;
   cursor: default;
   opacity: 0;
@@ -315,7 +315,7 @@ body {
 }
 
 .archetype-item--tall {
-  min-height: 220px;
+  min-height: 340px;
 }
 
 .archetype-item:hover {
@@ -327,12 +327,12 @@ body {
 /* Image: grayscale + dark in default, partially revealed on hover */
 .archetype-item-img {
   display: block;
-  filter: grayscale(100%) brightness(0.6);
+  filter: grayscale(100%) brightness(0.75);
   transition: filter 0.3s ease;
 }
 
 .archetype-item:hover .archetype-item-img {
-  filter: grayscale(30%) brightness(0.8);
+  filter: grayscale(30%) brightness(0.9);
 }
 
 /* Name: absolute overlay anchored to bottom */
@@ -387,7 +387,7 @@ body {
   font-size: clamp(3rem, 10vw, 10rem);
   letter-spacing: -0.02em;
   line-height: 1;
-  color: var(--text-primary);
+  color: #ffffff;
 }
 
 .s4-meta {
@@ -488,10 +488,15 @@ body {
 
   .lp-archetype-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .archetype-item {
+    min-height: 200px;
   }
 
   .archetype-item--tall {
-    min-height: 130px;
+    min-height: 200px;
   }
 }
 
