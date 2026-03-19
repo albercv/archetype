@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+
+@theme inline {
+  --font-cinzel: var(--font-cinzel);
+  --font-cormorant: var(--font-cormorant);
+}
+
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #141414;
+  --bg-card: #1a1a1a;
+  --bg-card-hover: #222222;
+  --gold-primary: #c9a84c;
+  --gold-light: #e8d48b;
+  --gold-dark: #8b7332;
+  --text-primary: #f5f0e8;
+  --text-secondary: #a09880;
+  --text-muted: #6b6555;
+  --border: #2a2520;
+  --border-gold: rgba(201, 168, 76, 0.3);
+  --error: #c44d4d;
+  --success: #4da06b;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-cormorant), Georgia, 'Times New Roman', serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
