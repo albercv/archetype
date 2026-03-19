@@ -35,12 +35,13 @@ export function HeroScene({ visible }: HeroSceneProps) {
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(45, mount.clientWidth / mount.clientHeight, 0.1, 100)
     camera.position.z = 4.5
+    camera.lookAt(0, 0, 0)
 
     // ── Shared material (chrome/metal look) ─────────────────────
     const mat = new THREE.MeshStandardMaterial({
       color: 0xf0ede6,
-      metalness: 0.9,
-      roughness: 0.15,
+      metalness: 0.95,
+      roughness: 0.08,
       transparent: true,
       opacity: 0,
     })
@@ -67,25 +68,30 @@ export function HeroScene({ visible }: HeroSceneProps) {
     cone.position.set(1.573, 1.573, 0)
     cone.rotation.z = -Math.PI / 4
 
-    // Group — centering: symbol spans x: -1.2 to ~1.66, y: -1.2 to ~1.66
+    // Group — center of bounding box: x in [-1.2, 1.66], y in [-1.2, 1.66]
+    // Center = (0.23, 0.23). Shift all children by (-0.23, -0.23) to put center at origin.
+    const offset = new THREE.Vector3(-0.23, -0.23, 0)
+    torus.position.add(offset)
+    shaft.position.add(offset)
+    cone.position.add(offset)
+
     const symbol = new THREE.Group()
     symbol.add(torus, shaft, cone)
-    // Offset to visually center the symbol
-    symbol.position.set(-0.23, -0.23, 0)
+    symbol.position.set(0, 0, 0)
     const scale = isMobile ? 0.7 : 1
     symbol.scale.setScalar(scale)
     scene.add(symbol)
 
     // ── Lighting ────────────────────────────────────────────────
-    const ambient = new THREE.AmbientLight(0xffffff, 0.2)
+    const ambient = new THREE.AmbientLight(0xffffff, 0.5)
     scene.add(ambient)
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1)
+    const dirLight = new THREE.DirectionalLight(0xffffff, 2)
     dirLight.position.set(-2, 3, 2)
     scene.add(dirLight)
 
     // Orbiting amber point light
-    const amberLight = new THREE.PointLight(0xff8c00, 0.4, 10)
+    const amberLight = new THREE.PointLight(0xff8c00, 0.8, 10)
     scene.add(amberLight)
 
     // ── Mouse ───────────────────────────────────────────────────

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ARQUETIPO | THE DARK MIRROR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&amp;family=Inter:wght@300;400&amp;family=Newsreader:ital,wght@1,300;1,600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-fixed-variant": "#6e3900",
+                        "on-tertiary-fixed": "#1b1c1c",
+                        "background": "#050505",
+                        "on-secondary-fixed": "#1c1c18",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary": "#31312c",
+                        "on-error-container": "#ffdad6",
+                        "inverse-surface": "#e5e2e1",
+                        "outline": "#a48c7a",
+                        "surface": "#050505",
+                        "error-container": "#93000a",
+                        "on-surface": "#e5e2e1",
+                        "surface-bright": "#3a3939",
+                        "surface-container": "#201f1f",
+                        "surface-variant": "#353534",
+                        "primary-fixed": "#ffdcc3",
+                        "surface-container-high": "#2a2a2a",
+                        "primary-fixed-dim": "#ffb77d",
+                        "error": "#ffb4ab",
+                        "on-error": "#690005",
+                        "on-tertiary-container": "#3e3e3e",
+                        "inverse-primary": "#904d00",
+                        "outline-variant": "#564334",
+                        "surface-tint": "#ffb77d",
+                        "inverse-on-surface": "#313030",
+                        "surface-dim": "#050505",
+                        "tertiary-fixed": "#e4e2e2",
+                        "tertiary-fixed-dim": "#c7c6c6",
+                        "secondary-fixed": "#e5e2db",
+                        "tertiary-container": "#aaa9a9",
+                        "primary-container": "#ff8c00",
+                        "secondary": "#c9c6c0",
+                        "on-surface-variant": "#ddc1ae",
+                        "on-tertiary": "#303031",
+                        "secondary-fixed-dim": "#c9c6c0",
+                        "on-primary": "#4d2600",
+                        "on-primary-container": "#623200",
+                        "surface-container-highest": "#353534",
+                        "tertiary": "#c7c6c6",
+                        "secondary-container": "#474742",
+                        "on-secondary-container": "#b7b5af",
+                        "primary": "#ffb77d",
+                        "on-secondary-fixed-variant": "#474742",
+                        "surface-container-low": "#1c1b1b",
+                        "on-primary-fixed": "#2f1500",
+                        "on-tertiary-fixed-variant": "#464747",
+                        "on-background": "#e5e2e1"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Newsreader", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #050505;
+            color: #F0EDE6;
+            scroll-behavior: smooth;
+        }
+        .void-gradient {
+            background: linear-gradient(to bottom, #050505 0%, #0e0e0e 50%, #050505 100%);
+        }
+    </style>
+</head>
+<body class="font-body selection:bg-primary-container selection:text-on-primary-container overflow-x-hidden">
+<!-- Hero Section -->
+<section class="relative h-screen w-full flex flex-col items-center justify-center px-8">
+<div class="absolute top-10 left-12">
+<span class="font-label italic text-xl tracking-widest text-on-surface">ARQUETIPO</span>
+</div>
+<div class="text-center space-y-8 max-w-5xl">
+<h1 class="font-headline font-bold text-7xl md:text-[10rem] tracking-tighter uppercase leading-none">
+            ¿Te conoces?
+        </h1>
+<p class="font-body font-light text-lg md:text-xl tracking-[0.3em] uppercase opacity-60">
+            La mayoría de hombres viven con un arquetipo que no conocen
+        </p>
+</div>
+<div class="absolute bottom-12 flex flex-col items-center gap-4">
+<span class="font-headline text-[10px] tracking-[0.4em] uppercase opacity-40">Scroll to excavate</span>
+<div class="w-[1px] h-20 bg-gradient-to-b from-on-surface/40 to-transparent"></div>
+</div>
+</section>
+<!-- Tension Section (Split Layout Update) -->
+<section class="w-full flex flex-col">
+<div class="h-screen flex items-center justify-start px-12 md:px-24">
+<h2 class="font-headline font-bold text-5xl md:text-8xl tracking-tighter uppercase max-w-4xl">
+            Determina cómo lideras
+        </h2>
+</div>
+<div class="h-screen flex items-center justify-end px-12 md:px-24 text-right">
+<h2 class="font-headline font-bold text-5xl md:text-8xl tracking-tighter uppercase max-w-4xl">
+            Cómo amas
+        </h2>
+</div>
+<!-- Split Layout Update -->
+<div class="h-screen w-full flex flex-col md:flex-row items-center justify-between px-12 md:px-24 gap-12">
+<div class="w-full md:w-[45%]">
+<h2 class="font-headline font-bold text-5xl md:text-8xl tracking-tighter uppercase text-[#FF8C00]">
+                Cómo destruyes
+            </h2>
+</div>
+<div class="w-full md:w-[45%] relative h-[400px] md:h-[600px] flex items-center justify-center">
+<!-- Image Stack -->
+<!-- 1. IMAGE_4: Bottom, -2deg -->
+<div class="absolute w-64 h-80 md:w-80 md:h-[400px] border border-[#A48C7A]/30 rotate-[-2deg] overflow-hidden translate-x-[-10px] translate-y-[20px]">
+<img alt="Lone figure" class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNOl2LiXh5H2kWe7aol4WNRdIAYz9KHKeTZzZ4R5wWO8g4jCZerjcZnk2Nbbhpr7i1DCfijoigL3vkHMwFNW4jRgmWCD-L3HyUPdB7WfS8cBpjEvBfCOw69GgHLu2AS-k4_y7LVhcki6A-dl_hm3OW6N_ECRos_cB_o53sBUpxd0JPOOA51oBT0c6b-7-st183aFdCqFDwjwOnk6jpLgEucYUYtQrJsmDdGJfpYWtuO_ct28Hcm2OxpGfHXJifFVV4oXd6EuPR0t2D"/>
+</div>
+<!-- 2. IMAGE_5: Middle-Bottom, +1deg -->
+<div class="absolute w-[260px] h-[330px] md:w-[330px] md:h-[410px] border border-[#A48C7A]/30 rotate-[1deg] overflow-hidden translate-x-[5px] translate-y-[10px] z-10">
+<img alt="Hands touching" class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfo5XhYVDWN1OjkTSn2eiIUEEMJFYQZbBqBHegnSRRaW8pQUF5qeQjyUK1z4w7EIWBLLq3wIE9OGXd5y_7voGl9WBXoWzM6iNQfmishU3TQ4MyY1ruOMqlcyVmQhz98AWYisoQT-nczl7pq3cyFVeSc2vFOWQQhbBQnB_sHXm-Ld_8rYDP3PHYrqZhK1UC0AlgiVuMSVJsdr0Wfs--hPpQqXiBZdzhFR1QQqWjmjHoSxU86BkvgJa_JfywmDUk73PCXZe29SugE-aB"/>
+</div>
+<!-- 3. IMAGE_6: Middle-Top, -1deg (Chair) -->
+<div class="absolute w-[250px] h-[310px] md:w-[310px] md:h-[390px] border border-[#A48C7A]/30 rotate-[-1deg] overflow-hidden translate-x-[-5px] translate-y-[-10px] z-20">
+<img alt="Empty chair" class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBE-TcOHHLeb3tOJp_Yep9k8PuLsmEGbrA_iuYZ1Y7iXyM2UQdDZhh1JgZEVHNgZ4xLmBArR4ciJxW6kSGOMlePIKq57fcFttIJAeL7svx3mcn1eYUUw12OejMGSBlSS-cY22PVWHJ1xYAjDVG80v680_5HfEeIQbIwx7v8rNYPC7vgAl2PottvPQGyNKK3DeM6t8iytpDYz3aYGLKDuBTJRNo0tVJHJEo4AaGgQ6piNT1htTeWOMNG5hxFQ_9F152h2LTVNqzLLwRo"/>
+</div>
+<!-- 4. IMAGE_7: Top-most, slightly offset (Shattered Mirror) -->
+<div class="absolute w-[270px] h-[340px] md:w-[340px] md:h-[420px] border border-[#A48C7A]/30 rotate-[2deg] overflow-hidden translate-x-[15px] translate-y-[-40px] z-30 shadow-2xl">
+<img alt="Shattered mirror" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQkzttUXxGbMdoi_PCG_Oah9BlpJTppc3e5bQcg4egyiFeLaC4XmzvU2tcPlQj_x5PkeRYs34EbaP47f_nMiPaW3hmCXoCN7LQLMnq81T9BKZ9vEgx5X6MY7Fcu2X_RZMfDe7Hb9o7SzXjcdyP1eALHx-nxZwFNrojhbYbs7Px12M45cSZkcEaemdgLHmeIfwDv0i1vS3aPNW-92EUpYp5yYYWWcLNYkghEWnByaovTv3gK2ubSYimmm-mJAojVARbiJUE_gIlY8mg"/>
+</div>
+</div>
+</div>
+<div class="h-screen flex items-center justify-center px-12 md:px-24 text-center">
+<div class="space-y-4">
+<h2 class="font-headline font-bold text-2xl md:text-4xl tracking-widest uppercase text-[#666666] max-w-4xl">
+                Y cómo te destruyes a ti mismo
+            </h2>
+<div class="font-label italic text-xl opacity-40">The shadow is always present.</div>
+</div>
+</div>
+</section>
+<!-- Archetypes Section -->
+<section class="min-h-screen w-full py-32 px-12 md:px-24 bg-surface-container-lowest">
+<div class="mb-24">
+<h2 class="font-headline font-bold text-6xl md:text-9xl tracking-tighter uppercase leading-none max-w-3xl">
+            12 formas de ser hombre
+        </h2>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-0 border-[0.5px] border-outline/20">
+<!-- Archetype Cards -->
+<div class="group relative aspect-[3/4] border-[0.5px] border-outline/20 bg-surface p-8 transition-all duration-300 hover:z-10 hover:bg-surface-container-high cursor-crosshair overflow-hidden">
+<span class="font-headline text-xs tracking-widest text-outline/50 uppercase">01</span>
+<div class="absolute bottom-8 left-8 transition-transform group-hover:translate-x-2 group-hover:text-primary-container">
+<h3 class="font-headline font-bold text-2xl uppercase">El Rey</h3>
+</div>
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="group relative aspect-[3/4] border-[0.5px] border-outline/20 bg-surface p-8 transition-all duration-300 hover:z-10 hover:bg-surface-container-high cursor-crosshair overflow-hidden">
+<span class="font-headline text-xs tracking-widest text-outline/50 uppercase">02</span>
+<div class="absolute bottom-8 left-8 transition-transform group-hover:translate-x-2 group-hover:text-primary-container">
+<h3 class="font-headline font-bold text-2xl uppercase">El Guerrero</h3>
+</div>
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="group relative aspect-[3/4] border-[0.5px] border-outline/20 bg-surface p-8 transition-all duration-300 hover:z-10 hover:bg-surface-container-high cursor-crosshair overflow-hidden">
+<span class="font-headline text-xs tracking-widest text-outline/50 uppercase">03</span>
+<div class="absolute bottom-8 left-8 transition-transform group-hover:translate-x-2 group-hover:text-primary-container">
+<h3 class="font-headline font-bold text-2xl uppercase">El Mago</h3>
+</div>
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="group relative aspect-[3/4] border-[0.5px] border-outline/20 bg-surface p-8 transition-all duration-300 hover:z-10 hover:bg-surface-container-high cursor-crosshair overflow-hidden">
+<span class="font-headline text-xs tracking-widest text-outline/50 uppercase">04</span>
+<div class="absolute bottom-8 left-8 transition-transform group-hover:translate-x-2 group-hover:text-primary-container">
+<h3 class="font-headline font-bold text-2xl uppercase">El Amante</h3>
+</div>
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="group relative aspect-[3/4] border-[0.5px] border-outline/20 bg-surface p-8 transition-all duration-300 hover:z-10 hover:bg-surface-container-high cursor-crosshair overflow-hidden">
+<span class="font-headline text-xs tracking-widest text-outline/50 uppercase">05</span>
+<div class="absolute bottom-8 left-8 transition-transform group-hover:translate-x-2 group-hover:text-primary-container">
+<h3 class="font-headline font-bold text-2xl uppercase">El Explorador</h3>
+</div>
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="group relative aspect-[3/4] border-[0.5px] border-outline/20 bg-surface p-8 transition-all duration-300 hover:z-10 hover:bg-surface-container-high cursor-crosshair overflow-hidden">
+<span class="font-headline text-xs tracking-widest text-outline/50 uppercase">06</span>
+<div class="absolute bottom-8 left-8 transition-transform group-hover:translate-x-2 group-hover:text-primary-container">
+<h3 class="font-headline font-bold text-2xl uppercase">El Sabio</h3>
+</div>
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="group relative aspect-[3/4] border-[0.5px] border-outline/20 bg-surface p-8 transition-all duration-300 hover:z-10 hover:bg-surface-container-high cursor-crosshair overflow-hidden">
+<span class="font-headline text-xs tracking-widest text-outline/50 uppercase">07</span>
+<div class="absolute bottom-8 left-8 transition-transform group-hover:translate-x-2 group-hover:text-primary-container">
+<h3 class="font-headline font-bold text-2xl uppercase">El Creador</h3>
+</div>
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="group relative aspect-[3/4] border-[0.5px] border-outline/20 bg-surface p-8 transition-all duration-300 hover:z-10 hover:bg-surface-container-high cursor-crosshair overflow-hidden">
+<span class="font-headline text-xs tracking-widest text-outline/50 uppercase">08</span>
+<div class="absolute bottom-8 left-8 transition-transform group-hover:translate-x-2 group-hover:text-primary-container">
+<h3 class="font-headline font-bold text-2xl uppercase">El Héroe</h3>
+</div>
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="group relative aspect-[3/4] border-[0.5px] border-outline/20 bg-surface p-8 transition-all duration-300 hover:z-10 hover:bg-surface-container-high cursor-crosshair overflow-hidden">
+<span class="font-headline text-xs tracking-widest text-outline/50 uppercase">09</span>
+<div class="absolute bottom-8 left-8 transition-transform group-hover:translate-x-2 group-hover:text-primary-container">
+<h3 class="font-headline font-bold text-2xl uppercase">El Rebelde</h3>
+</div>
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="group relative aspect-[3/4] border-[0.5px] border-outline/20 bg-surface p-8 transition-all duration-300 hover:z-10 hover:bg-surface-container-high cursor-crosshair overflow-hidden">
+<span class="font-headline text-xs tracking-widest text-outline/50 uppercase">10</span>
+<div class="absolute bottom-8 left-8 transition-transform group-hover:translate-x-2 group-hover:text-primary-container">
+<h3 class="font-headline font-bold text-2xl uppercase">El Bufón</h3>
+</div>
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="group relative aspect-[3/4] border-[0.5px] border-outline/20 bg-surface p-8 transition-all duration-300 hover:z-10 hover:bg-surface-container-high cursor-crosshair overflow-hidden">
+<span class="font-headline text-xs tracking-widest text-outline/50 uppercase">11</span>
+<div class="absolute bottom-8 left-8 transition-transform group-hover:translate-x-2 group-hover:text-primary-container">
+<h3 class="font-headline font-bold text-2xl uppercase">El Cuidador</h3>
+</div>
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="group relative aspect-[3/4] border-[0.5px] border-outline/20 bg-surface p-8 transition-all duration-300 hover:z-10 hover:bg-surface-container-high cursor-crosshair overflow-hidden">
+<span class="font-headline text-xs tracking-widest text-outline/50 uppercase">12</span>
+<div class="absolute bottom-8 left-8 transition-transform group-hover:translate-x-2 group-hover:text-primary-container">
+<h3 class="font-headline font-bold text-2xl uppercase">El Inocente</h3>
+</div>
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+</div>
+<div class="mt-16 flex justify-end">
+<p class="font-label italic text-3xl md:text-5xl text-on-surface/80">
+            Uno de ellos te domina.
+        </p>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="relative h-screen w-full flex flex-col items-center justify-center px-8 bg-surface">
+<div class="text-center space-y-12">
+<h2 class="font-headline font-bold text-7xl md:text-[12rem] tracking-tighter uppercase leading-none">
+            Descúbrelo
+        </h2>
+<div class="space-y-10">
+<p class="font-body font-light text-sm tracking-[0.2em] uppercase text-[#666666]">
+                12 preguntas · 3 minutos · Análisis por IA
+            </p>
+<div class="flex flex-col items-center gap-6">
+<button class="px-16 py-6 border border-on-surface font-headline font-bold text-xl uppercase tracking-widest transition-all duration-150 hover:bg-on-surface hover:text-background active:scale-95">
+                    INICIAR EXCAVACIÓN
+                </button>
+<p class="font-body font-light text-[10px] tracking-[0.3em] uppercase opacity-30">
+                    El test es gratuito. El informe completo vale 1€.
+                </p>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="absolute bottom-0 w-full border-t border-[#A48C7A]/30 flex flex-col md:flex-row justify-between items-center px-12 py-10 gap-6">
+<div class="font-['Newsreader'] italic text-[#F0EDE6] text-lg">ARQUETIPO</div>
+<div class="font-['Space_Grotesk'] text-[10px] tracking-[0.2em] uppercase text-[#666666]">
+            ©2024 THE DARK MIRROR. EXCAVATE THE SELF.
+        </div>
+<div class="flex gap-8">
+<a class="font-['Space_Grotesk'] text-[10px] tracking-[0.2em] uppercase text-[#666666] hover:text-[#F0EDE6] transition-colors" href="#">ARCHETYPES</a>
+<a class="font-['Space_Grotesk'] text-[10px] tracking-[0.2em] uppercase text-[#666666] hover:text-[#F0EDE6] transition-colors" href="#">METHODOLOGY</a>
+<a class="font-['Space_Grotesk'] text-[10px] tracking-[0.2em] uppercase text-[#666666] hover:text-[#F0EDE6] transition-colors" href="#">PRIVACY</a>
+</div>
+</footer>
+</section>
+</body></html>
