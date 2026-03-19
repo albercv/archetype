@@ -5,6 +5,7 @@
   --font-cormorant: var(--font-cormorant);
 }
 
+/* ─── Design tokens ─────────────────────────────────────────── */
 :root {
   --bg-primary: #0a0a0a;
   --bg-secondary: #141414;
@@ -22,14 +23,453 @@
   --success: #4da06b;
 }
 
-body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: var(--font-cormorant), Georgia, 'Times New Roman', serif;
-}
-
+/* ─── Base ──────────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-cormorant), Georgia, 'Times New Roman', serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* ─── Custom cursor ─────────────────────────────────────────── */
+.landing-desktop {
+  cursor: none;
+}
+
+.landing-desktop a,
+.landing-desktop button {
+  cursor: none;
+}
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgba(201, 168, 76, 0.7);
+  pointer-events: none;
+  z-index: 9999;
+  transition: width 0.2s ease, height 0.2s ease, background-color 0.2s ease,
+    border 0.2s ease;
+  mix-blend-mode: screen;
+}
+
+.custom-cursor.cursor--link {
+  width: 32px;
+  height: 32px;
+  background-color: transparent;
+  border: 1px solid rgba(201, 168, 76, 0.8);
+  margin-left: -6px;
+  margin-top: -6px;
+}
+
+/* ─── Keyframes ─────────────────────────────────────────────── */
+@keyframes ctaPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(201, 168, 76, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(201, 168, 76, 0);
+  }
+}
+
+/* ─── Landing root ──────────────────────────────────────────── */
+.landing-root {
+  background-color: var(--bg-primary);
+}
+
+/* ─── Shared grain overlay ──────────────────────────────────── */
+.l-grain {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+  pointer-events: none;
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+  z-index: 1;
+}
+
+/* ─── SECTION 1 — Hero ──────────────────────────────────────── */
+.l-hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 5rem 2rem;
+}
+
+.l-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.l-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(900px, 130vw);
+  height: min(900px, 130vw);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(201, 168, 76, 0.06) 0%,
+    rgba(201, 168, 76, 0.02) 40%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.l-hero__inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 680px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.l-eyebrow {
+  font-family: var(--font-cinzel), serif;
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--gold-primary);
+  opacity: 0.55;
+  margin-bottom: 1.6rem;
+}
+
+.l-rule {
+  width: 56px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 168, 76, 0.65) 30%,
+    rgba(201, 168, 76, 0.65) 70%,
+    transparent
+  );
+  margin-bottom: 1.6rem;
+  flex-shrink: 0;
+}
+
+.l-rule--wide {
+  width: 110px;
+  margin-bottom: 1.8rem;
+}
+
+/* Title: initial state hidden for animation */
+.l-hero__title {
+  font-family: var(--font-cinzel), serif;
+  font-size: clamp(2.6rem, 8.5vw, 5.8rem);
+  font-weight: 700;
+  color: var(--gold-primary);
+  letter-spacing: 0.07em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  margin-bottom: 1.8rem;
+  word-break: break-word;
+}
+
+.l-hero__title .char {
+  display: inline-block;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
+}
+
+/* Subtitle & CTA: start hidden */
+.l-hero__subtitle {
+  font-family: var(--font-cormorant), serif;
+  font-size: clamp(1.3rem, 3.5vw, 1.9rem);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  margin-bottom: 2.5rem;
+  opacity: 0;
+}
+
+.hero-cta-wrap {
+  opacity: 0;
+}
+
+/* ─── CTA button ────────────────────────────────────────────── */
+.l-cta {
+  display: inline-block;
+  font-family: var(--font-cinzel), serif;
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold-primary);
+  border: 1px solid rgba(201, 168, 76, 0.5);
+  padding: 1.2rem 3.5rem;
+  text-decoration: none;
+  transition: color 0.35s ease, background-color 0.35s ease,
+    border-color 0.35s ease;
+  position: relative;
+}
+
+.l-cta:hover {
+  color: #0a0a0a;
+  background-color: var(--gold-primary);
+  border-color: var(--gold-primary);
+}
+
+.l-cta--pulse {
+  animation: ctaPulse 2.8s ease-out infinite;
+}
+
+/* ─── SECTION 2 — Phrases ───────────────────────────────────── */
+.l-phrases {
+  padding: 8rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Parallax grain: fixed bg simulates slower movement */
+.l-phrases::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise2)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  opacity: 0.018;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.phrase {
+  font-family: var(--font-cormorant), serif;
+  font-size: clamp(1.5rem, 4vw, 2.4rem);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--text-secondary);
+  text-align: center;
+  max-width: 640px;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.phrase:last-child {
+  color: var(--text-primary);
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* ─── SECTION 3 — Archetypes grid ──────────────────────────── */
+.l-archetypes {
+  padding: 6rem 2rem 8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.l-section-title {
+  font-family: var(--font-cinzel), serif;
+  font-size: clamp(1.8rem, 5vw, 3.2rem);
+  font-weight: 700;
+  color: var(--gold-primary);
+  text-align: center;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  margin-bottom: 4rem;
+  opacity: 0;
+}
+
+.l-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.archetype-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(201, 168, 76, 0);
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: default;
+  opacity: 0;
+  transition: border-color 0.3s ease, background-color 0.3s ease,
+    box-shadow 0.3s ease;
+  will-change: transform;
+}
+
+.archetype-card:hover {
+  border-color: rgba(201, 168, 76, 0.4);
+  background-color: var(--bg-card-hover);
+  box-shadow: 0 4px 30px rgba(201, 168, 76, 0.06);
+}
+
+.archetype-numeral {
+  font-family: var(--font-cinzel), serif;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 400;
+  color: var(--gold-primary);
+  opacity: 0.5;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  transition: opacity 0.3s ease;
+}
+
+.archetype-card:hover .archetype-numeral {
+  opacity: 0.9;
+}
+
+.archetype-name {
+  font-family: var(--font-cinzel), serif;
+  font-size: clamp(0.6rem, 1.5vw, 0.75rem);
+  font-weight: 400;
+  color: var(--text-secondary);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.3;
+  transition: color 0.3s ease;
+}
+
+.archetype-card:hover .archetype-name {
+  color: var(--text-primary);
+}
+
+/* ─── SECTION 4 — CTA final ─────────────────────────────────── */
+.l-cta-section {
+  padding: 8rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(201, 168, 76, 0.025) 40%,
+    rgba(201, 168, 76, 0.025) 60%,
+    transparent
+  );
+}
+
+.cta-final-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  opacity: 0;
+}
+
+.l-cta-title {
+  font-family: var(--font-cinzel), serif;
+  font-size: clamp(2.2rem, 7vw, 5rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+
+.l-cta-sub {
+  font-family: var(--font-cormorant), serif;
+  font-size: 1rem;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+/* ─── prefers-reduced-motion ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .l-hero__title .char,
+  .l-hero__subtitle,
+  .hero-cta-wrap,
+  .l-section-title,
+  .phrase,
+  .archetype-card,
+  .cta-final-wrap {
+    opacity: 1 !important;
+    clip-path: none !important;
+    transform: none !important;
+  }
+
+  .l-cta--pulse {
+    animation: none;
+  }
+}
+
+/* ─── Responsive ────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .l-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 580px) {
+  .l-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .l-phrases {
+    padding: 6rem 1.5rem;
+    gap: 3rem;
+  }
+
+  .l-archetypes {
+    padding: 4rem 1.5rem 6rem;
+  }
+
+  .l-cta-section {
+    padding: 6rem 1.5rem;
+  }
+
+  .archetype-card {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .l-phrases::before {
+    background-attachment: unset;
+  }
 }
