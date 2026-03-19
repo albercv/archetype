@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -13,18 +14,25 @@ const Q_TEXT = '¿TE CONOCES?'
 const Q_LEN = Q_TEXT.length
 
 const ARCHETYPES = [
-  { id: 'ruler', name: 'EL REY', tall: false },
-  { id: 'warrior', name: 'EL GUERRERO', tall: true },
-  { id: 'magician', name: 'EL MAGO', tall: false },
-  { id: 'lover', name: 'EL AMANTE', tall: false },
-  { id: 'explorer', name: 'EL EXPLORADOR', tall: false },
-  { id: 'sage', name: 'EL SABIO', tall: false },
-  { id: 'creator', name: 'EL CREADOR', tall: false },
-  { id: 'hero', name: 'EL HÉROE', tall: true },
-  { id: 'outlaw', name: 'EL REBELDE', tall: false },
-  { id: 'jester', name: 'EL BUFÓN', tall: false },
-  { id: 'caregiver', name: 'EL CUIDADOR', tall: false },
-  { id: 'innocent', name: 'EL INOCENTE', tall: false },
+  { id: 'ruler', name: 'EL REY', tall: false, img: '/images/archetypes/ruler.png' },
+  { id: 'warrior', name: 'EL GUERRERO', tall: true, img: '/images/archetypes/warrior.png' },
+  { id: 'magician', name: 'EL MAGO', tall: false, img: '/images/archetypes/magician.png' },
+  { id: 'lover', name: 'EL AMANTE', tall: false, img: '/images/archetypes/lover.png' },
+  { id: 'explorer', name: 'EL EXPLORADOR', tall: false, img: '/images/archetypes/explorer.png' },
+  { id: 'sage', name: 'EL SABIO', tall: false, img: '/images/archetypes/sage.png' },
+  { id: 'creator', name: 'EL CREADOR', tall: false, img: '/images/archetypes/creator.png' },
+  { id: 'hero', name: 'EL HÉROE', tall: true, img: '/images/archetypes/hero.png' },
+  { id: 'outlaw', name: 'EL REBELDE', tall: false, img: '/images/archetypes/rebel.png' },
+  { id: 'jester', name: 'EL BUFÓN', tall: false, img: '/images/archetypes/jester.png' },
+  { id: 'caregiver', name: 'EL CUIDADOR', tall: false, img: '/images/archetypes/caregiver.png' },
+  { id: 'innocent', name: 'EL INOCENTE', tall: false, img: '/images/archetypes/innocent.png' },
+] as const
+
+const CARDS = [
+  { src: '/images/cards/howYouLead.png', alt: 'El líder que llevas dentro', amber: false },
+  { src: '/images/cards/howLove.png', alt: 'Cómo amas', amber: false },
+  { src: '/images/cards/howDestroy.png', alt: 'Cómo destruyes', amber: true },
+  { src: '/images/cards/howDestroyYourself.png', alt: 'Cómo te destruyes a ti mismo', amber: false },
 ] as const
 
 type PhraseAlign = 'left' | 'right' | 'center'
@@ -377,12 +385,19 @@ export function LandingPage() {
         {/* Right: stacking cards */}
         <div ref={cardStackRef} className="lp-s2-right">
           <div className="lp-card-stack">
-            {(['I', 'II', 'III', 'IV'] as const).map((numeral, i) => (
+            {CARDS.map((card, i) => (
               <div key={i} className="s2-card" style={{ zIndex: i + 1 }}>
                 <div className="s2-card-inner">
-                  <span className="s2-card-numeral" aria-hidden="true">
-                    {numeral}
-                  </span>
+                  <Image
+                    src={card.src}
+                    alt={card.alt}
+                    fill
+                    quality={80}
+                    className="s2-card-img"
+                    style={{ objectFit: 'cover' }}
+                    sizes="(max-width: 768px) 200px, 280px"
+                  />
+                  {card.amber && <div className="s2-card-amber" aria-hidden="true" />}
                 </div>
               </div>
             ))}
@@ -399,11 +414,20 @@ export function LandingPage() {
         </h2>
 
         <div ref={gridRef} className="lp-archetype-grid">
-          {ARCHETYPES.map(({ id, name, tall }) => (
+          {ARCHETYPES.map(({ id, name, tall, img }) => (
             <div
               key={id}
               className={`archetype-item${tall ? ' archetype-item--tall' : ''}`}
             >
+              <Image
+                src={img}
+                alt={name.toLowerCase()}
+                fill
+                quality={80}
+                className="archetype-item-img"
+                style={{ objectFit: 'cover' }}
+                sizes="(max-width: 580px) 50vw, 25vw"
+              />
               <span className="archetype-item-name">{name}</span>
             </div>
           ))}
