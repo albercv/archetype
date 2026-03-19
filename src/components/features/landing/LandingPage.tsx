@@ -1,37 +1,44 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// ─── Static data ──────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────
+
+const Q_TEXT = '¿TE CONOCES?'
+const Q_LEN = Q_TEXT.length
 
 const ARCHETYPES = [
-  { id: 'ruler', name: 'El Rey', numeral: 'I' },
-  { id: 'warrior', name: 'El Guerrero', numeral: 'II' },
-  { id: 'magician', name: 'El Mago', numeral: 'III' },
-  { id: 'lover', name: 'El Amante', numeral: 'IV' },
-  { id: 'explorer', name: 'El Explorador', numeral: 'V' },
-  { id: 'sage', name: 'El Sabio', numeral: 'VI' },
-  { id: 'creator', name: 'El Creador', numeral: 'VII' },
-  { id: 'hero', name: 'El Héroe', numeral: 'VIII' },
-  { id: 'outlaw', name: 'El Rebelde', numeral: 'IX' },
-  { id: 'jester', name: 'El Bufón', numeral: 'X' },
-  { id: 'caregiver', name: 'El Cuidador', numeral: 'XI' },
-  { id: 'innocent', name: 'El Inocente', numeral: 'XII' },
+  { id: 'ruler', name: 'EL REY', tall: false },
+  { id: 'warrior', name: 'EL GUERRERO', tall: true },
+  { id: 'magician', name: 'EL MAGO', tall: false },
+  { id: 'lover', name: 'EL AMANTE', tall: false },
+  { id: 'explorer', name: 'EL EXPLORADOR', tall: false },
+  { id: 'sage', name: 'EL SABIO', tall: false },
+  { id: 'creator', name: 'EL CREADOR', tall: false },
+  { id: 'hero', name: 'EL HÉROE', tall: true },
+  { id: 'outlaw', name: 'EL REBELDE', tall: false },
+  { id: 'jester', name: 'EL BUFÓN', tall: false },
+  { id: 'caregiver', name: 'EL CUIDADOR', tall: false },
+  { id: 'innocent', name: 'EL INOCENTE', tall: false },
 ] as const
 
-const PHRASES = [
-  'Cada hombre lleva un arquetipo dominante.',
-  'Determina cómo lideras, amas y luchas.',
-  'La mayoría nunca descubre el suyo.',
-  'Tú estás a punto de hacerlo.',
-] as const
+type PhraseAlign = 'left' | 'right' | 'center'
 
-// ─── Particle system ──────────────────────────────────────────
+const PHRASES: { text: string; align: PhraseAlign; color: string }[] = [
+  { text: 'DETERMINA CÓMO LIDERAS', align: 'left', color: '#F0EDE6' },
+  { text: 'CÓMO AMAS', align: 'right', color: '#F0EDE6' },
+  { text: 'CÓMO DESTRUYES', align: 'center', color: '#FF8C00' },
+  { text: 'Y CÓMO TE DESTRUYES\nA TI MISMO', align: 'center', color: '#555555' },
+]
+
+// ─── Types ────────────────────────────────────────────────────
+
+type AnimPhase = 'typing' | 'paused' | 'dissolving' | 'done'
 
 interface Particle {
   x: number
@@ -40,388 +47,387 @@ interface Particle {
   vy: number
   opacity: number
   size: number
-  opacityDir: number
-  opacitySpeed: number
-}
-
-function createParticles(w: number, h: number): Particle[] {
-  return Array.from({ length: 60 }, () => ({
-    x: Math.random() * w,
-    y: Math.random() * h,
-    vx: (Math.random() - 0.5) * 0.3,
-    vy: (Math.random() - 0.5) * 0.3,
-    opacity: Math.random() * 0.4 + 0.05,
-    size: Math.random() * 1.5 + 0.4,
-    opacityDir: Math.random() > 0.5 ? 1 : -1,
-    opacitySpeed: Math.random() * 0.002 + 0.001,
-  }))
 }
 
 // ─── Component ────────────────────────────────────────────────
 
 export function LandingPage() {
   const rootRef = useRef<HTMLDivElement>(null)
+  const heroRef = useRef<HTMLElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const cursorRef = useRef<HTMLDivElement>(null)
-  const titleRef = useRef<HTMLHeadingElement>(null)
+  const charRefs = useRef<Array<HTMLSpanElement | null>>(new Array(Q_LEN).fill(null))
   const phrasesRef = useRef<HTMLDivElement>(null)
-  const cardsRef = useRef<HTMLDivElement>(null)
-  const ctaRef = useRef<HTMLElement>(null)
+  const cardStackRef = useRef<HTMLDivElement>(null)
+  const section2Ref = useRef<HTMLElement>(null)
+  const section3Ref = useRef<HTMLElement>(null)
+  const section4Ref = useRef<HTMLElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
 
-  const [isMobile, setIsMobile] = useState(false)
+  const [phase, setPhase] = useState<AnimPhase>('typing')
+  const [typedCount, setTypedCount] = useState(0)
   const [reduced, setReduced] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
-  // Detect device capabilities once on mount
+  // Detect capabilities once on mount
   useEffect(() => {
-    setIsMobile(window.matchMedia('(pointer: coarse)').matches)
-    setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+    const r = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const m = window.matchMedia('(pointer: coarse)').matches
+    setReduced(r)
+    setIsMobile(m)
+    if (r) {
+      setTypedCount(Q_LEN)
+      setPhase('done')
+    }
   }, [])
 
-  // ── Canvas particles ────────────────────────────────────────
+  // Typewriter: add one char every 100ms
   useEffect(() => {
+    if (phase !== 'typing' || reduced) return
+    const id = setInterval(() => {
+      setTypedCount((c) => {
+        if (c >= Q_LEN - 1) {
+          clearInterval(id)
+          setTimeout(() => setPhase('paused'), 0)
+          return Q_LEN
+        }
+        return c + 1
+      })
+    }, 100)
+    return () => clearInterval(id)
+  }, [phase, reduced])
+
+  // After typing: pause 1.5s, then dissolve
+  useEffect(() => {
+    if (phase !== 'paused') return
+    const id = setTimeout(() => setPhase('dissolving'), 1500)
+    return () => clearTimeout(id)
+  }, [phase])
+
+  // Particle dissolution: letters → canvas particles floating up
+  const dissolve = useCallback((): (() => void) | undefined => {
     const canvas = canvasRef.current
-    if (!canvas || reduced) return
+    const hero = heroRef.current
+    if (!canvas || !hero) return
+
+    canvas.width = hero.offsetWidth
+    canvas.height = hero.offsetHeight
+    canvas.style.display = 'block'
+
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    let raf: number
-    let particles: Particle[] = []
+    const heroRect = hero.getBoundingClientRect()
+    const particles: Particle[] = []
 
-    const resize = () => {
-      canvas.width = canvas.offsetWidth
-      canvas.height = canvas.offsetHeight
-      particles = createParticles(canvas.width, canvas.height)
-    }
+    // Spawn particle cluster at each character's position
+    charRefs.current.forEach((span) => {
+      if (!span) return
+      const r = span.getBoundingClientRect()
+      const cx = r.left - heroRect.left + r.width / 2
+      const cy = r.top - heroRect.top + r.height / 2
 
-    const tick = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      for (const p of particles) {
-        p.x += p.vx
-        p.y += p.vy
-        p.opacity += p.opacityDir * p.opacitySpeed
-        if (p.opacity > 0.45 || p.opacity < 0.04) p.opacityDir *= -1
-        if (p.x < 0) p.x = canvas.width
-        if (p.x > canvas.width) p.x = 0
-        if (p.y < 0) p.y = canvas.height
-        if (p.y > canvas.height) p.y = 0
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(201,168,76,${p.opacity})`
-        ctx.fill()
+      for (let i = 0; i < 18; i++) {
+        particles.push({
+          x: cx + (Math.random() - 0.5) * r.width * 0.85,
+          y: cy + (Math.random() - 0.5) * r.height * 0.4,
+          vx: (Math.random() - 0.5) * 1.8,
+          vy: -(Math.random() * 2.5 + 0.8),
+          opacity: Math.random() * 0.5 + 0.5,
+          size: Math.random() * 2.2 + 0.4,
+        })
       }
-      raf = requestAnimationFrame(tick)
-    }
-
-    resize()
-    raf = requestAnimationFrame(tick)
-    const ro = new ResizeObserver(resize)
-    ro.observe(canvas)
-
-    return () => {
-      cancelAnimationFrame(raf)
-      ro.disconnect()
-    }
-  }, [reduced])
-
-  // ── Custom cursor ───────────────────────────────────────────
-  useEffect(() => {
-    if (isMobile || reduced) return
-    const cursor = cursorRef.current
-    if (!cursor) return
-
-    let mx = 0,
-      my = 0,
-      cx = 0,
-      cy = 0
-    let raf: number
-
-    const onMove = (e: MouseEvent) => {
-      mx = e.clientX
-      my = e.clientY
-      cursor.style.opacity = '1'
-    }
-
-    const onLinkEnter = () => cursor.classList.add('cursor--link')
-    const onLinkLeave = () => cursor.classList.remove('cursor--link')
-
-    const animate = () => {
-      cx += (mx - cx) * 0.1
-      cy += (my - cy) * 0.1
-      cursor.style.transform = `translate(${cx - 10}px, ${cy - 10}px)`
-      raf = requestAnimationFrame(animate)
-    }
-
-    const links = document.querySelectorAll('a, button')
-    links.forEach((l) => {
-      l.addEventListener('mouseenter', onLinkEnter)
-      l.addEventListener('mouseleave', onLinkLeave)
     })
 
-    raf = requestAnimationFrame(animate)
-    document.addEventListener('mousemove', onMove)
+    // Fade out the text characters
+    charRefs.current.forEach((span) => {
+      if (span) span.style.transition = 'opacity 0.15s'
+      if (span) span.style.opacity = '0'
+    })
 
-    return () => {
-      document.removeEventListener('mousemove', onMove)
-      cancelAnimationFrame(raf)
-      links.forEach((l) => {
-        l.removeEventListener('mouseenter', onLinkEnter)
-        l.removeEventListener('mouseleave', onLinkLeave)
-      })
+    let raf: number
+    const tick = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      let alive = false
+
+      for (const p of particles) {
+        if (p.opacity <= 0) continue
+        alive = true
+        p.x += p.vx
+        p.y += p.vy
+        p.vy -= 0.03 // accelerate upward (inverted gravity)
+        p.opacity -= 0.007
+
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(240,237,230,${Math.max(0, p.opacity)})`
+        ctx.fill()
+      }
+
+      if (alive) {
+        raf = requestAnimationFrame(tick)
+      } else {
+        canvas.style.display = 'none'
+        setPhase('done')
+      }
     }
-  }, [isMobile, reduced])
 
-  // ── GSAP animations ─────────────────────────────────────────
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
   useEffect(() => {
+    if (phase !== 'dissolving') return
+    return dissolve()
+  }, [phase, dissolve])
+
+  // GSAP: sections 2, 3, 4
+  useEffect(() => {
+    if (!section2Ref.current) return
+
     const ctx = gsap.context(() => {
-      // prefers-reduced-motion: reveal everything immediately
+      // ── Section 2: pinned scroll with stacking cards ──────────
+      const phraseList = phrasesRef.current?.querySelectorAll<HTMLElement>('.s2-phrase')
+      const cardList = cardStackRef.current?.querySelectorAll<HTMLElement>('.s2-card')
+      const phrases = phraseList ? Array.from(phraseList) : []
+      const cards = cardList ? Array.from(cardList) : []
+
+      if (phrases.length >= 4 && cards.length >= 4) {
+        // Explicit destructure: guarantees non-undefined with strict types
+        const [p0, p1, p2, p3] = phrases as [
+          HTMLElement,
+          HTMLElement,
+          HTMLElement,
+          HTMLElement,
+        ]
+        const [c0, c1, c2, c3] = cards as [
+          HTMLElement,
+          HTMLElement,
+          HTMLElement,
+          HTMLElement,
+        ]
+        const rots = [-2, 1, -1, 0] as const
+
+        // Set up initial states
+        gsap.set(c0, { y: '0%', rotation: rots[0] })
+        gsap.set(c1, { y: '110%', rotation: rots[1] })
+        gsap.set(c2, { y: '110%', rotation: rots[2] })
+        gsap.set(c3, { y: '110%', rotation: rots[3] })
+
+        if (reduced) {
+          gsap.set([p0, p1, p2, p3], { opacity: 1, y: 0 })
+          gsap.set(c0, { y: '0%', rotation: rots[0] })
+          gsap.set(c1, { y: '0%', rotation: rots[1] })
+          gsap.set(c2, { y: '0%', rotation: rots[2] })
+          gsap.set(c3, { y: '0%', rotation: rots[3] })
+        } else {
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: section2Ref.current,
+              start: 'top top',
+              end: '+=300%',
+              pin: true,
+              scrub: 1.5,
+            },
+          })
+
+          // Phase 0 → 1
+          tl.to(p0, { opacity: 0, y: -30, duration: 0.4 }, 0.05)
+            .to(p1, { opacity: 1, y: 0, duration: 0.4 }, 0.25)
+            .to(c1, { y: '0%', duration: 0.7, ease: 'power2.out' }, 0.15)
+
+          // Phase 1 → 2
+          tl.to(p1, { opacity: 0, y: -30, duration: 0.4 }, 1.05)
+            .to(p2, { opacity: 1, y: 0, duration: 0.4 }, 1.25)
+            .to(c2, { y: '0%', duration: 0.7, ease: 'power2.out' }, 1.15)
+
+          // Phase 2 → 3
+          tl.to(p2, { opacity: 0, y: -30, duration: 0.4 }, 2.05)
+            .to(p3, { opacity: 1, y: 0, duration: 0.4 }, 2.25)
+            .to(c3, { y: '0%', duration: 0.7, ease: 'power2.out' }, 2.15)
+        }
+      }
+
+      // ── Section 3: stagger reveal ─────────────────────────────
+      const gridItems = gridRef.current?.querySelectorAll('.archetype-item')
+      if (gridItems?.length) {
+        if (reduced) {
+          gsap.set(gridItems, { opacity: 1, scale: 1 })
+          gsap.set('.s3-title', { opacity: 1 })
+        } else {
+          gsap.fromTo(
+            '.s3-title',
+            { opacity: 0, y: 24 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.7,
+              ease: 'power2.out',
+              scrollTrigger: { trigger: section3Ref.current, start: 'top 80%', once: true },
+            },
+          )
+
+          gsap.to(gridItems, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.5,
+            stagger: 0.06,
+            ease: 'power2.out',
+            scrollTrigger: { trigger: gridRef.current, start: 'top 78%', once: true },
+          })
+        }
+      }
+
+      // ── Section 4: fade in ────────────────────────────────────
       if (reduced) {
-        gsap.set(
-          [
-            '.char',
-            '.l-hero__subtitle',
-            '.hero-cta-wrap',
-            '.l-section-title',
-            '.phrase',
-            '.archetype-card',
-            '.cta-final-wrap',
-          ],
-          { opacity: 1, y: 0, clipPath: 'none', scale: 1 },
+        gsap.set('.s4-inner', { opacity: 1 })
+      } else {
+        gsap.fromTo(
+          '.s4-inner',
+          { opacity: 0, y: 32 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.9,
+            ease: 'power2.out',
+            scrollTrigger: { trigger: section4Ref.current, start: 'top 80%', once: true },
+          },
         )
-        return
       }
-
-      // Title: per-character clip-path reveal
-      const chars = titleRef.current?.querySelectorAll('.char')
-      if (chars?.length) {
-        gsap.to(chars, {
-          opacity: 1,
-          clipPath: 'inset(0 0% 0 0)',
-          duration: 0.45,
-          stagger: 0.04,
-          ease: 'power2.out',
-          delay: 0.4,
-        })
-      }
-
-      // Subtitle: fade up after title completes (~2.1s)
-      gsap.to('.l-hero__subtitle', {
-        opacity: 1,
-        y: 0,
-        duration: 0.9,
-        ease: 'power2.out',
-        delay: 2.1,
-      })
-
-      // CTA: fade up after subtitle
-      gsap.to('.hero-cta-wrap', {
-        opacity: 1,
-        y: 0,
-        duration: 0.9,
-        ease: 'power2.out',
-        delay: 2.55,
-      })
-
-      // Section title
-      gsap.fromTo(
-        '.l-section-title',
-        { opacity: 0, y: 24 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'power2.out',
-          scrollTrigger: { trigger: '.l-archetypes', start: 'top 80%', once: true },
-        },
-      )
-
-      // Phrases: stagger on scroll
-      phrasesRef.current?.querySelectorAll('.phrase').forEach((el) => {
-        gsap.to(el, {
-          opacity: 1,
-          y: 0,
-          duration: 0.9,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: el, start: 'top 86%', once: true },
-        })
-      })
-
-      // Archetype cards: stagger on scroll
-      const cards = cardsRef.current?.querySelectorAll('.archetype-card')
-      if (cards?.length) {
-        gsap.to(cards, {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.55,
-          stagger: 0.05,
-          ease: 'power2.out',
-          scrollTrigger: { trigger: cardsRef.current, start: 'top 78%', once: true },
-        })
-      }
-
-      // CTA final section
-      gsap.to('.cta-final-wrap', {
-        opacity: 1,
-        y: 0,
-        duration: 1,
-        ease: 'power2.out',
-        scrollTrigger: { trigger: ctaRef.current, start: 'top 80%', once: true },
-      })
     }, rootRef)
 
     return () => ctx.revert()
   }, [reduced])
 
-  // ── Magnetic button ─────────────────────────────────────────
-  const onMagMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (isMobile) return
-    const el = e.currentTarget
-    const r = el.getBoundingClientRect()
-    gsap.to(el, {
-      x: (e.clientX - r.left - r.width / 2) * 0.28,
-      y: (e.clientY - r.top - r.height / 2) * 0.28,
-      duration: 0.3,
-      ease: 'power2.out',
-    })
-  }
-
-  const onMagLeave = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (isMobile) return
-    gsap.to(e.currentTarget, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1,0.4)' })
-  }
-
-  // ── 3D card tilt ─────────────────────────────────────────────
-  const onTilt = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isMobile) return
-    const c = e.currentTarget
-    const r = c.getBoundingClientRect()
-    gsap.to(c, {
-      rotateX: -((e.clientY - r.top - r.height / 2) / (r.height / 2)) * 7,
-      rotateY: ((e.clientX - r.left - r.width / 2) / (r.width / 2)) * 7,
-      duration: 0.3,
-      ease: 'power2.out',
-      transformPerspective: 600,
-    })
-  }
-
-  const onTiltLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isMobile) return
-    gsap.to(e.currentTarget, {
-      rotateX: 0,
-      rotateY: 0,
-      duration: 0.5,
-      ease: 'elastic.out(1,0.4)',
-    })
-  }
-
   return (
-    <div ref={rootRef} className={`landing-root${isMobile ? '' : ' landing-desktop'}`}>
-      {/* Custom cursor — desktop only */}
-      {!isMobile && (
-        <div
-          ref={cursorRef}
-          className="custom-cursor"
+    <div ref={rootRef} className="lp-root">
+      {/* ── SECTION 1: The Hook ──────────────────────────── */}
+      <section ref={heroRef} className="lp-hero">
+        <canvas
+          ref={canvasRef}
+          className="lp-canvas"
           aria-hidden="true"
-          style={{ opacity: 0 }}
+          style={{ display: 'none' }}
         />
-      )}
 
-      {/* ── SECTION 1: Hero ──────────────────────────────── */}
-      <section className="l-hero">
-        <canvas ref={canvasRef} className="l-canvas" aria-hidden="true" />
-        <div className="l-grain" aria-hidden="true" />
-        <div className="l-glow" aria-hidden="true" />
+        {/* Top-left serif label */}
+        <p className="lp-hero-label">
+          <em>Arquetipo</em>
+        </p>
 
-        <div className="l-hero__inner">
-          <p className="l-eyebrow">Test Psicológico · XII Arquetipos</p>
-          <div className="l-rule" aria-hidden="true" />
-
-          <h1
-            ref={titleRef}
-            className="l-hero__title"
-            aria-label="Descubre Tu Arquetipo"
-          >
-            {'Descubre Tu Arquetipo'.split('').map((ch, i) => (
+        <div className="lp-hero-center">
+          {/* Typewriter question */}
+          <h1 className="lp-question" aria-label={Q_TEXT}>
+            {Q_TEXT.split('').map((ch, i) => (
               <span
                 key={i}
-                className="char"
+                ref={(el) => {
+                  charRefs.current[i] = el
+                }}
+                className="tw-char"
                 aria-hidden="true"
-                style={{ willChange: 'clip-path, opacity' }}
+                style={{
+                  opacity: reduced || typedCount > i ? 1 : 0,
+                  transition: 'opacity 0.04s',
+                }}
               >
                 {ch === ' ' ? '\u00A0' : ch}
               </span>
             ))}
+            {/* Blinking cursor — visible only while typing/paused */}
+            {(phase === 'typing' || phase === 'paused') && (
+              <span className="tw-cursor" aria-hidden="true" />
+            )}
           </h1>
 
-          <div className="l-rule l-rule--wide" aria-hidden="true" />
+          {/* Subtitle: appears after dissolution */}
+          {(phase === 'done' || reduced) && (
+            <p className="lp-hero-sub">
+              La mayoría de hombres viven con un arquetipo que no conocen.
+            </p>
+          )}
+        </div>
 
-          <p className="l-hero__subtitle">12 preguntas. Tu verdad. Sin filtros.</p>
+        {/* Scroll indicator */}
+        {(phase === 'done' || reduced) && (
+          <div className="lp-scroll-arrow" aria-hidden="true">
+            <div className="lp-scroll-line" />
+            <div className="lp-scroll-chevron" />
+          </div>
+        )}
+      </section>
 
-          <div className="hero-cta-wrap">
-            <Link
-              href="/quiz"
-              className="l-cta l-cta--pulse"
-              onMouseMove={onMagMove}
-              onMouseLeave={onMagLeave}
+      {/* ── SECTION 2: The Tension (pinned) ──────────────── */}
+      <section ref={section2Ref} className="lp-s2">
+        {/* Left: changing phrases */}
+        <div ref={phrasesRef} className="lp-s2-left">
+          {PHRASES.map((phrase, i) => (
+            <p
+              key={i}
+              className="s2-phrase"
+              style={{
+                textAlign: phrase.align,
+                color: phrase.color,
+              }}
             >
-              Comenzar el Test
-            </Link>
+              {phrase.text}
+            </p>
+          ))}
+        </div>
+
+        {/* Right: stacking cards */}
+        <div ref={cardStackRef} className="lp-s2-right">
+          <div className="lp-card-stack">
+            {(['I', 'II', 'III', 'IV'] as const).map((numeral, i) => (
+              <div key={i} className="s2-card" style={{ zIndex: i + 1 }}>
+                <div className="s2-card-inner">
+                  <span className="s2-card-numeral" aria-hidden="true">
+                    {numeral}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 2: Scroll phrases ─────────────────────── */}
-      <section className="l-phrases" ref={phrasesRef}>
-        {PHRASES.map((phrase, i) => (
-          <p key={i} className="phrase">
-            {phrase}
-          </p>
-        ))}
-      </section>
-
-      {/* ── SECTION 3: Archetypes grid ────────────────────── */}
-      <section className="l-archetypes">
-        <h2 className="l-section-title">
-          12 Arquetipos.
+      {/* ── SECTION 3: The Archetypes ─────────────────────── */}
+      <section ref={section3Ref} className="lp-s3">
+        <h2 className="s3-title">
+          12 FORMAS
           <br />
-          ¿Cuál domina en ti?
+          DE SER HOMBRE
         </h2>
 
-        <div ref={cardsRef} className="l-grid">
-          {ARCHETYPES.map(({ id, name, numeral }) => (
+        <div ref={gridRef} className="lp-archetype-grid">
+          {ARCHETYPES.map(({ id, name, tall }) => (
             <div
               key={id}
-              className="archetype-card"
-              onMouseMove={onTilt}
-              onMouseLeave={onTiltLeave}
+              className={`archetype-item${tall ? ' archetype-item--tall' : ''}`}
             >
-              <span className="archetype-numeral" aria-hidden="true">
-                {numeral}
-              </span>
-              <span className="archetype-name">{name}</span>
+              <span className="archetype-item-name">{name}</span>
             </div>
           ))}
         </div>
+
+        <p className="s3-footnote">
+          <em>Uno de ellos te domina.</em>
+        </p>
       </section>
 
-      {/* ── SECTION 4: CTA final ──────────────────────────── */}
-      <section ref={ctaRef} className="l-cta-section">
-        <div className="cta-final-wrap">
-          <h2 className="l-cta-title">
-            3 minutos.
-            <br />
-            Tu verdad.
-          </h2>
-          <Link
-            href="/quiz"
-            className="l-cta l-cta--pulse"
-            onMouseMove={onMagMove}
-            onMouseLeave={onMagLeave}
-          >
-            Comenzar el Test
+      {/* ── SECTION 4: The CTA ────────────────────────────── */}
+      <section ref={section4Ref} className="lp-s4">
+        <div className="s4-inner">
+          <h2 className="s4-title">DESCÚBRELO</h2>
+          <p className="s4-meta">12 preguntas · 3 minutos · Análisis por IA</p>
+          <Link href="/quiz" className="s4-btn">
+            <span>COMENZAR EL TEST</span>
           </Link>
-          <p className="l-cta-sub">Análisis personalizado por IA · Sin registro</p>
+          <p className="s4-small">El test es gratuito. El informe completo vale 1€.</p>
         </div>
+
+        <p className="s4-foot">
+          <em>Arquetipo</em>
+        </p>
       </section>
     </div>
   )
