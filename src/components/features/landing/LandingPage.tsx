@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { HeroScene } from './HeroScene'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -309,6 +310,9 @@ export function LandingPage() {
 
       {/* ── SECTION 1: The Hook ──────────────────────────── */}
       <section ref={heroRef} className="lp-hero">
+        {/* 3D wireframe scene — mounts immediately, reveals after dissolution */}
+        <HeroScene visible={phase === 'done' || reduced} />
+
         <canvas
           ref={canvasRef}
           className="lp-canvas"
@@ -346,14 +350,6 @@ export function LandingPage() {
             )}
           </h1>
 
-          {/* Reveal: staggered narrative after dissolution */}
-          {(phase === 'done' || reduced) && (
-            <div className="lp-hero-reveal">
-              <p className="lp-hero-reveal-1">12 ARQUETIPOS EXISTEN</p>
-              <p className="lp-hero-reveal-2">Uno domina tu vida</p>
-              <p className="lp-hero-reveal-3">¿Cuál es el tuyo?</p>
-            </div>
-          )}
         </div>
 
         {/* Scroll indicator */}

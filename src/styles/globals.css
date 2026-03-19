@@ -160,41 +160,6 @@ body {
   animation: cursorBlink 0.7s step-end infinite;
 }
 
-/* Post-dissolution narrative reveal */
-.lp-hero-reveal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 3rem;
-  text-align: center;
-}
-
-.lp-hero-reveal-1 {
-  font-family: var(--font-space), sans-serif;
-  font-weight: 700;
-  font-size: clamp(1.5rem, 4vw, 3.5rem);
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  animation: fadeUp 0.7s ease 0.5s both;
-}
-
-.lp-hero-reveal-2 {
-  font-family: var(--font-inter), sans-serif;
-  font-weight: 300;
-  font-size: clamp(0.9rem, 2vw, 1.2rem);
-  color: var(--text-secondary);
-  animation: fadeUp 0.7s ease 1s both;
-}
-
-.lp-hero-reveal-3 {
-  font-family: var(--font-inter), sans-serif;
-  font-weight: 300;
-  font-size: clamp(0.85rem, 1.8vw, 1rem);
-  color: var(--text-muted);
-  animation: fadeUp 0.7s ease 1.5s both;
-}
-
 /* Scroll arrow */
 .lp-scroll-arrow {
   position: absolute;
