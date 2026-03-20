@@ -39,9 +39,11 @@ export function HeroScene({ visible }: HeroSceneProps) {
 
     // ── Shared material (chrome/metal look) ─────────────────────
     const mat = new THREE.MeshStandardMaterial({
-      color: 0xf0ede6,
-      metalness: 0.95,
-      roughness: 0.08,
+      color: 0xffffff,
+      metalness: 1.0,
+      roughness: 0.05,
+      emissive: 0xf0ede6,
+      emissiveIntensity: 0.15,
       transparent: true,
       opacity: 0,
     })
@@ -78,20 +80,20 @@ export function HeroScene({ visible }: HeroSceneProps) {
     const symbol = new THREE.Group()
     symbol.add(torus, shaft, cone)
     symbol.position.set(0, 0, 0)
-    const scale = isMobile ? 0.7 : 1
+    const scale = isMobile ? 0.49 : 0.7
     symbol.scale.setScalar(scale)
     scene.add(symbol)
 
     // ── Lighting ────────────────────────────────────────────────
-    const ambient = new THREE.AmbientLight(0xffffff, 0.5)
+    const ambient = new THREE.AmbientLight(0xffffff, 0.8)
     scene.add(ambient)
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 2)
+    const dirLight = new THREE.DirectionalLight(0xffffff, 3)
     dirLight.position.set(-2, 3, 2)
     scene.add(dirLight)
 
     // Orbiting amber point light
-    const amberLight = new THREE.PointLight(0xff8c00, 0.8, 10)
+    const amberLight = new THREE.PointLight(0xff8c00, 1.2, 10)
     scene.add(amberLight)
 
     // ── Mouse ───────────────────────────────────────────────────
@@ -194,9 +196,9 @@ export function HeroScene({ visible }: HeroSceneProps) {
         <p
           style={{
             fontFamily: 'var(--font-inter), sans-serif',
-            fontWeight: 300,
+            fontWeight: 400,
             fontSize: 'clamp(0.8rem, 1.8vw, 1rem)',
-            color: '#666666',
+            color: '#999999',
             opacity: textVisible ? 1 : 0,
             transform: textVisible ? 'translateY(0)' : 'translateY(10px)',
             transition: 'opacity 0.7s ease, transform 0.7s ease',
@@ -207,9 +209,9 @@ export function HeroScene({ visible }: HeroSceneProps) {
         <p
           style={{
             fontFamily: 'var(--font-inter), sans-serif',
-            fontWeight: 300,
+            fontWeight: 400,
             fontSize: 'clamp(0.7rem, 1.5vw, 0.85rem)',
-            color: '#888888',
+            color: '#AAAAAA',
             opacity: text2Visible ? 1 : 0,
             transform: text2Visible ? 'translateY(0)' : 'translateY(10px)',
             transition: 'opacity 0.7s ease, transform 0.7s ease',

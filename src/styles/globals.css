@@ -15,9 +15,9 @@
 
   /* Text */
   --text-primary: #f0ede6;
-  --text-secondary: #666666;
-  --text-muted: #444444;
-  --text-deep: #333333;
+  --text-secondary: #999999;
+  --text-muted: #777777;
+  --text-deep: #666666;
 
   /* Accent — one use per screen maximum */
   --accent: #ff8c00;
@@ -44,7 +44,7 @@ body {
   background: var(--void);
   color: var(--text-primary);
   font-family: var(--font-inter), system-ui, sans-serif;
-  font-weight: 300;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -343,7 +343,7 @@ body {
   font-family: var(--font-news), Georgia, serif;
   font-style: italic;
   font-size: 1.15rem;
-  color: #888;
+  color: #AAAAAA;
   text-align: left;
   padding-left: 0.5rem;
 }
@@ -379,7 +379,7 @@ body {
 
 .s4-meta {
   font-family: var(--font-inter), sans-serif;
-  font-weight: 300;
+  font-weight: 400;
   font-size: 0.82rem;
   color: var(--text-secondary);
   letter-spacing: 0.1em;
@@ -429,7 +429,7 @@ body {
 .s4-small {
   font-family: var(--font-inter), sans-serif;
   font-size: 0.7rem;
-  font-weight: 300;
+  font-weight: 400;
   color: var(--text-muted);
   letter-spacing: 0.04em;
 }
