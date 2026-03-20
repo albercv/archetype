@@ -1,4 +1,3 @@
-// Prisma schema — completado en Tarea 2
 generator client {
   provider = "prisma-client-js"
 }
@@ -6,4 +5,33 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Session {
+  id          String    @id @default(cuid())
+  answers     Json
+  email       String?
+  status      String    @default("PENDING")
+  paymentId   String?   @unique
+  report      Json?
+  reportHtml  String?   @db.Text
+  paidAt      DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([email])
+  @@index([paymentId])
+  @@index([status])
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  sessionId String?
+  event     String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([event])
+  @@index([createdAt])
 }
