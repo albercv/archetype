@@ -106,8 +106,10 @@ function LoadingScreen() {
   )
 }
 
-// ── Error screen ─────────────────────────────────────────────
-function ErrorScreen({ sessionId }: { sessionId: string }) {
+// ── Timeout / error screen ────────────────────────────────────
+function TimeoutScreen() {
+  const [hovered, setHovered] = useState(false)
+
   return (
     <main
       style={{
@@ -127,22 +129,47 @@ function ErrorScreen({ sessionId }: { sessionId: string }) {
         style={{
           fontFamily: 'var(--font-space), sans-serif',
           fontWeight: 700,
-          fontSize: '1rem',
-          color: '#C44D4D',
+          fontSize: 'clamp(0.85rem, 2.5vw, 1rem)',
+          color: '#F0EDE6',
           letterSpacing: '0.1em',
           margin: 0,
         }}
       >
-        ERROR AL GENERAR INFORME
+        NO HEMOS PODIDO GENERAR TU INFORME
       </p>
-      <p style={{ color: C.textSecondary, fontSize: '0.85rem', margin: 0, maxWidth: '400px' }}>
-        Algo salió mal al procesar tu informe. ID de sesión: <code style={{ color: C.accent }}>{sessionId}</code>
+      <p
+        style={{
+          fontWeight: 400,
+          fontSize: '0.9rem',
+          color: '#999',
+          margin: 0,
+          maxWidth: '400px',
+          lineHeight: 1.6,
+        }}
+      >
+        Estamos trabajando en ello. Recibirás tu informe por email en las próximas horas.
       </p>
       <Link
-        href="/quiz"
-        style={{ color: C.accent, fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none' }}
+        href="/"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          fontFamily: 'var(--font-space), sans-serif',
+          fontWeight: 700,
+          fontSize: '0.78rem',
+          letterSpacing: '0.15em',
+          textTransform: 'uppercase',
+          textDecoration: 'none',
+          padding: '0.75rem 2rem',
+          border: `1px solid ${C.borderGhost}`,
+          borderRadius: 0,
+          background: hovered ? C.textPrimary : 'transparent',
+          color: hovered ? C.void : C.textPrimary,
+          transition: 'background 0.15s, color 0.15s',
+          display: 'inline-block',
+        }}
       >
-        Repetir el test
+        VOLVER AL INICIO
       </Link>
     </main>
   )
@@ -487,13 +514,21 @@ export default function ReportPage({ params }: { params: Promise<{ sessionId: st
   const [status, setStatus] = useState<string | null>(null)
   const [report, setReport] = useState<Report | null>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const startTimeRef = useRef<number>(Date.now())
 
   useEffect(() => {
     async function poll() {
+      if (Date.now() - startTimeRef.current > 60000) {
+        setStatus('TIMEOUT')
+        if (intervalRef.current) clearInterval(intervalRef.current)
+        return
+      }
+
       try {
         const res = await fetch(`/api/reports/${sessionId}`)
         if (!res.ok) {
           setStatus('FAILED')
+          if (intervalRef.current) clearInterval(intervalRef.current)
           return
         }
         const data = (await res.json()) as { status: string; report: Report | null }
@@ -517,7 +552,7 @@ export default function ReportPage({ params }: { params: Promise<{ sessionId: st
     }
   }, [sessionId])
 
-  if (status === 'FAILED') return <ErrorScreen sessionId={sessionId} />
+  if (status === 'TIMEOUT' || status === 'FAILED') return <TimeoutScreen />
   if (status === 'COMPLETED' && report) return <ReportView report={report} />
   return <LoadingScreen />
 }
