@@ -1,32 +1,101 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { HeroScene } from './HeroScene'
+import { HeroMessages } from './HeroMessages'
 
 gsap.registerPlugin(ScrollTrigger)
 
 // ─── Constants ────────────────────────────────────────────────
 
-const Q_TEXT = '¿TE CONOCES?'
-const Q_LEN = Q_TEXT.length
-
 const ARCHETYPES = [
-  { id: 'ruler', name: 'EL REY', tall: false, img: '/images/archetypes/ruler.png' },
-  { id: 'warrior', name: 'EL GUERRERO', tall: true, img: '/images/archetypes/warrior.png' },
-  { id: 'magician', name: 'EL MAGO', tall: false, img: '/images/archetypes/magician.png' },
-  { id: 'lover', name: 'EL AMANTE', tall: false, img: '/images/archetypes/lover.png' },
-  { id: 'explorer', name: 'EL EXPLORADOR', tall: false, img: '/images/archetypes/explorer.png' },
-  { id: 'sage', name: 'EL SABIO', tall: false, img: '/images/archetypes/sage.png' },
-  { id: 'creator', name: 'EL CREADOR', tall: false, img: '/images/archetypes/creator.png' },
-  { id: 'hero', name: 'EL HÉROE', tall: true, img: '/images/archetypes/hero.png' },
-  { id: 'outlaw', name: 'EL REBELDE', tall: false, img: '/images/archetypes/rebel.png' },
-  { id: 'jester', name: 'EL BUFÓN', tall: false, img: '/images/archetypes/jester.png' },
-  { id: 'caregiver', name: 'EL CUIDADOR', tall: false, img: '/images/archetypes/caregiver.png' },
-  { id: 'innocent', name: 'EL INOCENTE', tall: false, img: '/images/archetypes/innocent.png' },
+  {
+    id: 'ruler',
+    name: 'EL REY',
+    tall: false,
+    img: '/images/archetypes/ruler.png',
+    shortDescription: 'Lidera con visión y orden. Su sombra es la tiranía.',
+  },
+  {
+    id: 'warrior',
+    name: 'EL GUERRERO',
+    tall: true,
+    img: '/images/archetypes/warrior.png',
+    shortDescription: 'Actúa con disciplina y coraje. Su sombra es la violencia sin causa.',
+  },
+  {
+    id: 'magician',
+    name: 'EL MAGO',
+    tall: false,
+    img: '/images/archetypes/magician.png',
+    shortDescription: 'Transforma la realidad con conocimiento. Su sombra es la manipulación.',
+  },
+  {
+    id: 'lover',
+    name: 'EL AMANTE',
+    tall: false,
+    img: '/images/archetypes/lover.png',
+    shortDescription: 'Conecta con pasión y sensibilidad. Su sombra es la obsesión.',
+  },
+  {
+    id: 'explorer',
+    name: 'EL EXPLORADOR',
+    tall: false,
+    img: '/images/archetypes/explorer.png',
+    shortDescription: 'Busca libertad y nuevos caminos. Su sombra es la huida permanente.',
+  },
+  {
+    id: 'sage',
+    name: 'EL SABIO',
+    tall: false,
+    img: '/images/archetypes/sage.png',
+    shortDescription: 'Persigue la verdad y el entendimiento. Su sombra es la parálisis por análisis.',
+  },
+  {
+    id: 'creator',
+    name: 'EL CREADOR',
+    tall: false,
+    img: '/images/archetypes/creator.png',
+    shortDescription: 'Construye lo que no existe. Su sombra es el perfeccionismo destructivo.',
+  },
+  {
+    id: 'hero',
+    name: 'EL HÉROE',
+    tall: true,
+    img: '/images/archetypes/hero.png',
+    shortDescription: 'Supera obstáculos y protege. Su sombra es la arrogancia del salvador.',
+  },
+  {
+    id: 'outlaw',
+    name: 'EL REBELDE',
+    tall: false,
+    img: '/images/archetypes/rebel.png',
+    shortDescription: 'Rompe lo que no funciona. Su sombra es la destrucción sin propósito.',
+  },
+  {
+    id: 'jester',
+    name: 'EL BUFÓN',
+    tall: false,
+    img: '/images/archetypes/jester.png',
+    shortDescription: 'Revela verdades con humor. Su sombra es la evasión de lo serio.',
+  },
+  {
+    id: 'caregiver',
+    name: 'EL CUIDADOR',
+    tall: false,
+    img: '/images/archetypes/caregiver.png',
+    shortDescription: 'Protege y sirve a otros. Su sombra es el martirio y autoanulación.',
+  },
+  {
+    id: 'innocent',
+    name: 'EL INOCENTE',
+    tall: false,
+    img: '/images/archetypes/innocent.png',
+    shortDescription: 'Cree en el bien y la pureza. Su sombra es la negación de la realidad.',
+  },
 ] as const
 
 const CARDS = [
@@ -45,26 +114,10 @@ const PHRASES: { text: string; align: PhraseAlign; color: string }[] = [
   { text: 'Y CÓMO TE DESTRUYES\nA TI MISMO', align: 'center', color: '#888888' },
 ]
 
-// ─── Types ────────────────────────────────────────────────────
-
-type AnimPhase = 'typing' | 'paused' | 'dissolving' | 'done'
-
-interface Particle {
-  x: number
-  y: number
-  vx: number
-  vy: number
-  opacity: number
-  size: number
-}
-
 // ─── Component ────────────────────────────────────────────────
 
 export function LandingPage() {
   const rootRef = useRef<HTMLDivElement>(null)
-  const heroRef = useRef<HTMLElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const charRefs = useRef<Array<HTMLSpanElement | null>>(new Array(Q_LEN).fill(null))
   const phrasesRef = useRef<HTMLDivElement>(null)
   const cardStackRef = useRef<HTMLDivElement>(null)
   const section2Ref = useRef<HTMLElement>(null)
@@ -72,119 +125,21 @@ export function LandingPage() {
   const section4Ref = useRef<HTMLElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
 
-  const [phase, setPhase] = useState<AnimPhase>('typing')
-  const [typedCount, setTypedCount] = useState(0)
   const [reduced, setReduced] = useState(false)
+  const [ctaVisible, setCtaVisible] = useState(false)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
 
-  // Detect capabilities once on mount
   useEffect(() => {
-    const r = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    setReduced(r)
-    if (r) {
-      setTypedCount(Q_LEN)
-      setPhase('done')
-    }
+    setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+    setIsMobile(window.matchMedia('(pointer: coarse)').matches)
   }, [])
 
-  // Typewriter: add one char every 100ms
+  // CTA fade-in after 1s
   useEffect(() => {
-    if (phase !== 'typing' || reduced) return
-    const id = setInterval(() => {
-      setTypedCount((c) => {
-        if (c >= Q_LEN - 1) {
-          clearInterval(id)
-          setTimeout(() => setPhase('paused'), 0)
-          return Q_LEN
-        }
-        return c + 1
-      })
-    }, 100)
-    return () => clearInterval(id)
-  }, [phase, reduced])
-
-  // After typing: pause 1.5s, then dissolve
-  useEffect(() => {
-    if (phase !== 'paused') return
-    const id = setTimeout(() => setPhase('dissolving'), 1500)
+    const id = setTimeout(() => setCtaVisible(true), 1000)
     return () => clearTimeout(id)
-  }, [phase])
-
-  // Particle dissolution: letters → canvas particles floating up
-  const dissolve = useCallback((): (() => void) | undefined => {
-    const canvas = canvasRef.current
-    const hero = heroRef.current
-    if (!canvas || !hero) return
-
-    canvas.width = hero.offsetWidth
-    canvas.height = hero.offsetHeight
-    canvas.style.display = 'block'
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const heroRect = hero.getBoundingClientRect()
-    const particles: Particle[] = []
-
-    // Spawn particle cluster at each character's position
-    charRefs.current.forEach((span) => {
-      if (!span) return
-      const r = span.getBoundingClientRect()
-      const cx = r.left - heroRect.left + r.width / 2
-      const cy = r.top - heroRect.top + r.height / 2
-
-      for (let i = 0; i < 18; i++) {
-        particles.push({
-          x: cx + (Math.random() - 0.5) * r.width * 0.85,
-          y: cy + (Math.random() - 0.5) * r.height * 0.4,
-          vx: (Math.random() - 0.5) * 1.8,
-          vy: -(Math.random() * 2.5 + 0.8),
-          opacity: Math.random() * 0.5 + 0.5,
-          size: Math.random() * 2.2 + 0.4,
-        })
-      }
-    })
-
-    // Fade out the text characters
-    charRefs.current.forEach((span) => {
-      if (span) span.style.transition = 'opacity 0.15s'
-      if (span) span.style.opacity = '0'
-    })
-
-    let raf: number
-    const tick = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      let alive = false
-
-      for (const p of particles) {
-        if (p.opacity <= 0) continue
-        alive = true
-        p.x += p.vx
-        p.y += p.vy
-        p.vy -= 0.03 // accelerate upward (inverted gravity)
-        p.opacity -= 0.007
-
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(240,237,230,${Math.max(0, p.opacity)})`
-        ctx.fill()
-      }
-
-      if (alive) {
-        raf = requestAnimationFrame(tick)
-      } else {
-        canvas.style.display = 'none'
-        setPhase('done')
-      }
-    }
-
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
   }, [])
-
-  useEffect(() => {
-    if (phase !== 'dissolving') return
-    return dissolve()
-  }, [phase, dissolve])
 
   // GSAP: sections 2, 3, 4
   useEffect(() => {
@@ -198,22 +153,10 @@ export function LandingPage() {
       const cards = cardList ? Array.from(cardList) : []
 
       if (phrases.length >= 4 && cards.length >= 4) {
-        // Explicit destructure: guarantees non-undefined with strict types
-        const [p0, p1, p2, p3] = phrases as [
-          HTMLElement,
-          HTMLElement,
-          HTMLElement,
-          HTMLElement,
-        ]
-        const [c0, c1, c2, c3] = cards as [
-          HTMLElement,
-          HTMLElement,
-          HTMLElement,
-          HTMLElement,
-        ]
+        const [p0, p1, p2, p3] = phrases as [HTMLElement, HTMLElement, HTMLElement, HTMLElement]
+        const [c0, c1, c2, c3] = cards as [HTMLElement, HTMLElement, HTMLElement, HTMLElement]
         const rots = [-2, 1, -1, 0] as const
 
-        // Set up initial states
         gsap.set(c0, { y: '0%', rotation: rots[0] })
         gsap.set(c1, { y: '110%', rotation: rots[1] })
         gsap.set(c2, { y: '110%', rotation: rots[2] })
@@ -236,17 +179,14 @@ export function LandingPage() {
             },
           })
 
-          // Phase 0 → 1
           tl.to(p0, { opacity: 0, y: -30, duration: 0.4 }, 0.05)
             .to(p1, { opacity: 1, y: 0, duration: 0.4 }, 0.25)
             .to(c1, { y: '0%', duration: 0.7, ease: 'power2.out' }, 0.15)
 
-          // Phase 1 → 2
           tl.to(p1, { opacity: 0, y: -30, duration: 0.4 }, 1.05)
             .to(p2, { opacity: 1, y: 0, duration: 0.4 }, 1.25)
             .to(c2, { y: '0%', duration: 0.7, ease: 'power2.out' }, 1.15)
 
-          // Phase 2 → 3
           tl.to(p2, { opacity: 0, y: -30, duration: 0.4 }, 2.05)
             .to(p3, { opacity: 1, y: 0, duration: 0.4 }, 2.25)
             .to(c3, { y: '0%', duration: 0.7, ease: 'power2.out' }, 2.15)
@@ -304,66 +244,41 @@ export function LandingPage() {
     return () => ctx.revert()
   }, [reduced])
 
-
   return (
     <div ref={rootRef} className="lp-root">
 
       {/* ── SECTION 1: The Hook ──────────────────────────── */}
-      <section ref={heroRef} className="lp-hero">
-        {/* 3D wireframe scene — mounts immediately, reveals after dissolution */}
-        <HeroScene visible={phase === 'done' || reduced} />
-
-        <canvas
-          ref={canvasRef}
-          className="lp-canvas"
-          aria-hidden="true"
-          style={{ display: 'none' }}
-        />
-
+      <section className="lp-hero">
         {/* Top-left serif label */}
         <p className="lp-hero-label">
           <em>Arquetipo</em>
         </p>
 
         <div className="lp-hero-center">
-          {/* Typewriter question */}
-          <h1 className="lp-question" aria-label={Q_TEXT}>
-            {Q_TEXT.split('').map((ch, i) => (
-              <span
-                key={i}
-                ref={(el) => {
-                  charRefs.current[i] = el
-                }}
-                className="tw-char"
-                aria-hidden="true"
-                style={{
-                  opacity: reduced || typedCount > i ? 1 : 0,
-                  transition: 'opacity 0.04s',
-                }}
-              >
-                {ch === ' ' ? '\u00A0' : ch}
-              </span>
-            ))}
-            {/* Blinking cursor — visible only while typing/paused */}
-            {(phase === 'typing' || phase === 'paused') && (
-              <span className="tw-cursor" aria-hidden="true" />
-            )}
-          </h1>
+          <HeroMessages reduced={reduced} />
+        </div>
 
+        {/* Hero CTA — fades in after 1s */}
+        <div
+          className="lp-hero-cta"
+          style={{ opacity: ctaVisible || reduced ? 1 : 0 }}
+          aria-hidden={!ctaVisible && !reduced}
+        >
+          <Link href="/quiz" className="lp-hero-cta-btn">
+            <span>DESCUBRE TU ARQUETIPO</span>
+          </Link>
+          <p className="lp-hero-cta-meta">3 minutos · 12 preguntas · Gratis</p>
         </div>
 
         {/* Scroll indicator */}
-        {(phase === 'done' || reduced) && (
-          <div className="lp-scroll-arrow" aria-hidden="true">
-            <div className="lp-scroll-line" />
-            <div className="lp-scroll-chevron" />
-          </div>
-        )}
+        <div className="lp-scroll-arrow" aria-hidden="true">
+          <div className="lp-scroll-line" />
+          <div className="lp-scroll-chevron" />
+        </div>
       </section>
 
       {/* ── SECTION 2: The Tension (pinned) ──────────────── */}
       <section ref={section2Ref} className="lp-s2">
-        {/* Left: changing phrases */}
         <div ref={phrasesRef} className="lp-s2-left">
           {PHRASES.map((phrase, i) => (
             <p
@@ -379,7 +294,6 @@ export function LandingPage() {
           ))}
         </div>
 
-        {/* Right: stacking cards */}
         <div ref={cardStackRef} className="lp-s2-right">
           <div className="lp-card-stack">
             {CARDS.map((card, i) => (
@@ -411,21 +325,38 @@ export function LandingPage() {
         </h2>
 
         <div ref={gridRef} className="lp-archetype-grid">
-          {ARCHETYPES.map(({ id, name, tall, img }) => (
+          {ARCHETYPES.map(({ id, name, tall, img, shortDescription }) => (
             <div
               key={id}
               className={`archetype-item${tall ? ' archetype-item--tall' : ''}`}
+              onClick={
+                isMobile
+                  ? () => setExpandedId((prev) => (prev === id ? null : id))
+                  : undefined
+              }
+              style={isMobile ? { cursor: 'pointer' } : undefined}
             >
-              <Image
-                src={img}
-                alt={name.toLowerCase()}
-                fill
-                quality={80}
-                className="archetype-item-img"
-                style={{ objectFit: 'cover' }}
-                sizes="(max-width: 580px) 50vw, 25vw"
-              />
-              <span className="archetype-item-name">{name}</span>
+              {/* Image + name inside overflow-hidden inner */}
+              <div className="archetype-item-inner">
+                <Image
+                  src={img}
+                  alt={name.toLowerCase()}
+                  fill
+                  quality={80}
+                  className="archetype-item-img"
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 580px) 50vw, 25vw"
+                />
+                <span className="archetype-item-name">{name}</span>
+
+                {/* Mobile expand: shows on tap inside the item */}
+                {isMobile && expandedId === id && (
+                  <div className="archetype-expand-text">{shortDescription}</div>
+                )}
+              </div>
+
+              {/* Desktop tooltip: overflows the item (CSS hover) */}
+              <div className="archetype-tooltip">{shortDescription}</div>
             </div>
           ))}
         </div>
