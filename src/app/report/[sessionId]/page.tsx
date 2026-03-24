@@ -4,6 +4,7 @@ import { use, useEffect, useState, useRef, type CSSProperties } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { FloatingLogo } from '@/components/ui/FloatingLogo'
+import { Footer } from '@/components/ui/Footer'
 
 interface ArchetypeEntry {
   id: string
@@ -982,6 +983,7 @@ export default function ReportPage({ params }: { params: Promise<{ sessionId: st
     <div style={{ position: 'relative' }}>
       <FloatingLogo />
       {screen}
+      <Footer />
     </div>
   )
 }

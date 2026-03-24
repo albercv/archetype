@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { QUESTIONS } from '@/lib/data/questions'
 import type { OptionId } from '@/lib/data/questions'
 import { FloatingLogo } from '@/components/ui/FloatingLogo'
+import { Footer } from '@/components/ui/Footer'
 
 interface Answer {
   questionId: number
@@ -49,6 +50,7 @@ function Paywall({ answers }: { answers: Answer[] }) {
   }
 
   return (
+  <>
     <main
       style={{
         minHeight: '100vh',
@@ -214,6 +216,8 @@ function Paywall({ answers }: { answers: Answer[] }) {
         </p>
       </div>
     </main>
+    <Footer />
+  </>
   )
 }
 
@@ -267,6 +271,7 @@ export default function QuizPage() {
   if (!question) return null
 
   return (
+    <>
     <main
       style={{
         minHeight: '100vh',
@@ -421,5 +426,7 @@ export default function QuizPage() {
         </div>
       </div>
     </main>
+    <Footer />
+    </>
   )
 }

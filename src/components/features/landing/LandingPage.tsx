@@ -7,6 +7,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { HeroMessages } from './HeroMessages'
 import { FloatingLogo } from '@/components/ui/FloatingLogo'
+import { Footer } from '@/components/ui/Footer'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -382,6 +383,8 @@ export function LandingPage() {
           <em>Arquetipo</em>
         </p>
       </section>
+
+      <Footer />
     </div>
   )
 }
