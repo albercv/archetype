@@ -5,24 +5,21 @@ import { HERO_MESSAGES } from '@/lib/data/hero-messages'
 
 type Phase = 'typing' | 'paused' | 'dissolving' | 'waiting'
 
+interface Particle {
+  x: number
+  y: number
+  vx: number
+  vy: number
+  opacity: number
+  size: number
+}
+
 function pickNext(exclude: number): number {
   const len = HERO_MESSAGES.length
   if (len <= 1) return 0
   let idx = Math.floor(Math.random() * (len - 1))
   if (idx >= exclude) idx++
   return idx
-}
-
-function buildShuffleRanks(len: number): number[] {
-  // Create a random permutation: ranks[i] = dissolution delay rank for char i
-  const indices = Array.from({ length: len }, (_, i) => i)
-  for (let i = indices.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    const tmp = indices[i]!
-    indices[i] = indices[j]!
-    indices[j] = tmp
-  }
-  return indices
 }
 
 export function HeroMessages({ reduced }: { reduced: boolean }) {
@@ -32,13 +29,17 @@ export function HeroMessages({ reduced }: { reduced: boolean }) {
   const [phase, setPhase] = useState<Phase>('typing')
   const [typedCount, setTypedCount] = useState(0)
   const prevIdx = useRef(msgIdx)
-  // shuffleRanks[charIndex] = delay rank (0 = first to dissolve)
-  const shuffleRanks = useRef<number[]>([])
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  // Populated via ref callbacks on each render; reset when msg changes
+  const charRefsArr = useRef<(HTMLSpanElement | null)[]>([])
 
   const msg = HERO_MESSAGES[msgIdx] ?? ''
   const len = msg.length
 
-  // Typewriter
+  // Reset ref array length for current message (runs in render, before commit)
+  charRefsArr.current = Array(len).fill(null)
+
+  // ── Typewriter ────────────────────────────────────────────────
   useEffect(() => {
     if (phase !== 'typing' || reduced) return
     setTypedCount(0)
@@ -55,25 +56,90 @@ export function HeroMessages({ reduced }: { reduced: boolean }) {
     return () => clearInterval(id)
   }, [phase, msgIdx, reduced, len])
 
-  // Paused → dissolve (generate shuffle order before transitioning)
+  // ── Paused → dissolve ─────────────────────────────────────────
   useEffect(() => {
     if (phase !== 'paused' || reduced) return
-    const id = setTimeout(() => {
-      shuffleRanks.current = buildShuffleRanks(len)
-      setPhase('dissolving')
-    }, 2000)
+    const id = setTimeout(() => setPhase('dissolving'), 2000)
     return () => clearTimeout(id)
-  }, [phase, reduced, len])
+  }, [phase, reduced])
 
-  // Dissolve → wait (0.6s transition + stagger + 0.3s pause)
+  // ── Canvas particle dissolution ───────────────────────────────
+  // Spans are already opacity:0 (React-controlled) when this effect runs,
+  // but getBoundingClientRect still returns valid layout positions.
   useEffect(() => {
     if (phase !== 'dissolving') return
-    const ms = (len - 1) * 30 + 600 + 300
-    const id = setTimeout(() => setPhase('waiting'), ms)
-    return () => clearTimeout(id)
-  }, [phase, len])
 
-  // Wait → next message
+    const canvas = canvasRef.current
+    if (!canvas) {
+      setPhase('waiting')
+      return
+    }
+
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+    canvas.style.display = 'block'
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      canvas.style.display = 'none'
+      setPhase('waiting')
+      return
+    }
+
+    const particles: Particle[] = []
+
+    charRefsArr.current.forEach((span) => {
+      if (!span) return
+      const r = span.getBoundingClientRect()
+      const cx = r.left + r.width / 2
+      const cy = r.top + r.height / 2
+      for (let i = 0; i < 12; i++) {
+        particles.push({
+          x: cx + (Math.random() - 0.5) * r.width * 0.85,
+          y: cy + (Math.random() - 0.5) * r.height * 0.4,
+          vx: (Math.random() - 0.5) * 1.8,
+          vy: -(Math.random() * 2.5 + 0.8),
+          opacity: Math.random() * 0.5 + 0.5,
+          size: Math.random() * 2.2 + 0.4,
+        })
+      }
+    })
+
+    let raf: number
+    const tick = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      let alive = false
+
+      for (const p of particles) {
+        if (p.opacity <= 0.01) continue
+        alive = true
+        p.x += p.vx
+        p.y += p.vy
+        p.vy -= 0.03
+        p.opacity *= 0.98
+
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(240,237,230,${p.opacity.toFixed(3)})`
+        ctx.fill()
+      }
+
+      if (alive) {
+        raf = requestAnimationFrame(tick)
+      } else {
+        canvas.style.display = 'none'
+        setPhase('waiting')
+      }
+    }
+
+    raf = requestAnimationFrame(tick)
+    return () => {
+      cancelAnimationFrame(raf)
+      canvas.style.display = 'none'
+    }
+  }, [phase])
+
+  // ── Wait → next message ───────────────────────────────────────
   useEffect(() => {
     if (phase !== 'waiting') return
     const id = setTimeout(() => {
@@ -82,69 +148,83 @@ export function HeroMessages({ reduced }: { reduced: boolean }) {
       setMsgIdx(next)
       setTypedCount(0)
       setPhase('typing')
-    }, 100)
+    }, 300)
     return () => clearTimeout(id)
   }, [phase])
 
-  // Reduced motion: skip to done
+  // ── Reduced motion: show static ───────────────────────────────
   useEffect(() => {
     if (!reduced) return
     setTypedCount(len)
     setPhase('paused')
   }, [reduced, len])
 
-  const isDissolving = phase === 'dissolving'
+  // ── Span opacity: fully React-controlled, no DOM manipulation ──
+  // 'dissolving' and 'waiting': opacity 0 instantly (hides old msg,
+  //  prevents flash of old text before new typewriter starts)
+  const spanOpacity = (i: number): number => {
+    if (reduced) return 1
+    if (phase === 'dissolving' || phase === 'waiting') return 0
+    return typedCount > i ? 1 : 0
+  }
+  const spanTransition = phase === 'dissolving' || phase === 'waiting' ? 'none' : 'opacity 0.04s'
 
   return (
-    <div style={{ textAlign: 'center', width: '100%' }}>
-      <h1 className="lp-question" aria-label={msg} style={{ marginBottom: '1.5rem' }}>
-        {msg.split('').map((ch, i) => {
-          const rank = shuffleRanks.current[i] ?? i
-          const delay = `${(rank * 0.03).toFixed(2)}s`
-          return (
+    <>
+      {/* Canvas: fixed over viewport for particle animation */}
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+          zIndex: 50,
+          display: 'none',
+        }}
+      />
+
+      <div style={{ textAlign: 'center', width: '100%' }}>
+        <h1 className="lp-question" aria-label={msg} style={{ marginBottom: '1.5rem' }}>
+          {msg.split('').map((ch, i) => (
             <span
               key={`${msgIdx}-${i}`}
               className="tw-char"
               aria-hidden="true"
-              style={
-                isDissolving
-                  ? {
-                      opacity: 0,
-                      transform: 'translateY(-20px)',
-                      filter: 'blur(4px)',
-                      transition: `opacity 0.6s ease ${delay}, transform 0.6s ease ${delay}, filter 0.6s ease ${delay}`,
-                    }
-                  : {
-                      opacity: reduced || typedCount > i ? 1 : 0,
-                      transform: 'translateY(0)',
-                      filter: 'blur(0px)',
-                      transition: 'opacity 0.04s',
-                    }
-              }
+              ref={(el) => {
+                charRefsArr.current[i] = el
+              }}
+              style={{
+                opacity: spanOpacity(i),
+                transition: spanTransition,
+              }}
             >
               {ch === ' ' ? '\u00A0' : ch}
             </span>
-          )
-        })}
-        {(phase === 'typing' || phase === 'paused') && !reduced && (
-          <span className="tw-cursor" aria-hidden="true" />
-        )}
-      </h1>
+          ))}
+          {(phase === 'typing' || phase === 'paused') && !reduced && (
+            <span className="tw-cursor" aria-hidden="true" />
+          )}
+        </h1>
 
-      <p
-        style={{
-          fontFamily: 'var(--font-inter), sans-serif',
-          fontWeight: 400,
-          fontSize: 'clamp(0.78rem, 1.8vw, 0.95rem)',
-          color: '#555',
-          letterSpacing: '0.03em',
-          lineHeight: 1.5,
-          maxWidth: '420px',
-          margin: '0 auto',
-        }}
-      >
-        La mayoría de hombres viven con un arquetipo que no conocen.
-      </p>
-    </div>
+        <p
+          style={{
+            fontFamily: 'var(--font-inter), sans-serif',
+            fontWeight: 400,
+            fontSize: 'clamp(0.78rem, 1.8vw, 0.95rem)',
+            color: '#555',
+            letterSpacing: '0.03em',
+            lineHeight: 1.5,
+            maxWidth: '420px',
+            margin: '0 auto',
+          }}
+        >
+          La mayoría de hombres viven con un arquetipo que no conocen.
+        </p>
+      </div>
+    </>
   )
 }
