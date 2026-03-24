@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { CreateSessionSchema } from '@/lib/validators/session'
 import { createSession } from '@/lib/repositories/session'
 import { createCheckout } from '@/lib/services/payment'
-import { type Prisma } from '@prisma/client'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +16,8 @@ export async function POST(request: NextRequest) {
     }
 
     const { answers } = parsed.data
-    const sessionId = await createSession(answers as Prisma.InputJsonValue)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sessionId = await createSession(answers as any)
     const checkoutUrl = await createCheckout(sessionId)
 
     return NextResponse.json({ sessionId, checkoutUrl }, { status: 201 })

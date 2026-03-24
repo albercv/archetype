@@ -2,22 +2,17 @@ services:
   app:
     build:
       context: .
-      dockerfile: docker/Dockerfile.dev
+      dockerfile: docker/Dockerfile
     ports:
       - '3000:3000'
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.next
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/archetype?schema=public
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/archetype
     env_file:
       - .env.local
     depends_on:
       db:
         condition: service_healthy
     restart: unless-stopped
-
   db:
     image: postgres:16-alpine
     ports:
@@ -34,6 +29,5 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
-
 volumes:
   postgres_data:
