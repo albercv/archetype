@@ -17,13 +17,16 @@ interface LemonSqueezyWebhookPayload {
 }
 
 export async function POST(request: NextRequest) {
+  console.log('[WEBHOOK] Received request')
   const rawBody = await request.text()
   const signature = request.headers.get('x-signature') ?? ''
   const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET ?? ''
 
   if (!verifyLemonSqueezySignature(rawBody, signature, secret)) {
+    console.log('[WEBHOOK] Invalid signature')
     return new NextResponse('Invalid signature', { status: 400 })
   }
+  console.log('[WEBHOOK] Signature verified')
 
   let payload: LemonSqueezyWebhookPayload
   try {
@@ -41,6 +44,7 @@ export async function POST(request: NextRequest) {
 
   const orderId = payload.data.id
   const email = payload.data.attributes.user_email
+  console.log('[WEBHOOK] Event:', payload.meta.event_name, 'SessionId:', sessionId, 'Email:', email)
 
   // Idempotency: skip if already processed (paymentId unique constraint)
   const existing = await getSession(sessionId).catch(() => null)
@@ -61,10 +65,14 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    console.log('[WEBHOOK] Calling generateReport for session:', sessionId)
     await generateReport(sessionId)
-  } catch {
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err))
+    console.error('[WEBHOOK] Report generation failed:', error.message, error.stack)
     await updateSession(sessionId, { status: 'FAILED' }).catch(() => undefined)
   }
 
+  console.log('[WEBHOOK] Done, returning 200')
   return new NextResponse('OK', { status: 200 })
 }

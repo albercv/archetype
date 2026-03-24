@@ -63,28 +63,51 @@ function buildUserMessage(answers: Answer[]): string {
 }
 
 export async function generateReport(sessionId: string): Promise<void> {
+  console.log('[REPORT] Starting generation for session:', sessionId)
   const session = await getSession(sessionId)
   if (!session) throw new Error(`Session ${sessionId} not found`)
+  console.log('[REPORT] Session found, status:', session.status)
 
   // session.answers is stored as JSON; cast via unknown is safe here
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const answers = session.answers as unknown as Answer[]
+  const scores = scoreArchetypes(answers)
+  console.log('[REPORT] Scores calculated:', JSON.stringify(scores.slice(0, 3)))
+
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-  const message = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 2000,
-    system: SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: buildUserMessage(answers) }],
-  })
+  let response: Awaited<ReturnType<typeof client.messages.create>>
+  try {
+    console.log('[REPORT] Calling Anthropic API...')
+    response = await client.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: buildUserMessage(answers) }],
+    })
+    console.log('[REPORT] Anthropic response received, length:', response.content[0]?.type === 'text' ? response.content[0].text.length : 0)
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err))
+    console.error('[REPORT] Anthropic API error:', error.message, error.stack)
+    throw error
+  }
 
-  const text = message.content[0]?.type === 'text' ? message.content[0].text : ''
-  const report = JSON.parse(text) as Prisma.InputJsonValue
+  const text = response.content[0]?.type === 'text' ? response.content[0].text : ''
+  let report: Prisma.InputJsonValue
+  try {
+    report = JSON.parse(text) as Prisma.InputJsonValue
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err))
+    console.error('[REPORT] JSON parse error:', error.message)
+    throw error
+  }
 
+  console.log('[REPORT] Saving report to DB')
   await updateSession(sessionId, {
     report: report,
     reportHtml: null,
     status: 'COMPLETED',
     completedAt: new Date(),
   })
+  console.log('[REPORT] Generation complete for session:', sessionId)
 }
