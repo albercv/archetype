@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { QUESTIONS } from '@/lib/data/questions'
 import type { OptionId } from '@/lib/data/questions'
+import { FloatingLogo } from '@/components/ui/FloatingLogo'
 
 interface Answer {
   questionId: number
@@ -58,8 +59,10 @@ function Paywall({ answers }: { answers: Answer[] }) {
         justifyContent: 'center',
         padding: 'clamp(2rem, 5vw, 4rem) clamp(1.5rem, 4vw, 2rem)',
         fontFamily: 'var(--font-inter), sans-serif',
+        position: 'relative',
       }}
     >
+      <FloatingLogo />
       <div
         style={{
           width: '100%',
@@ -272,8 +275,10 @@ export default function QuizPage() {
         flexDirection: 'column',
         fontFamily: 'var(--font-inter), sans-serif',
         overflowX: 'hidden',
+        position: 'relative',
       }}
     >
+      <FloatingLogo />
       {/* ── Progress bar ─────────────────────────────────────── */}
       <div style={{ width: '100%', height: '2px', background: C.surfaceLow, flexShrink: 0 }}>
         <div

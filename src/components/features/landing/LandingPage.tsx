@@ -6,6 +6,7 @@ import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { HeroMessages } from './HeroMessages'
+import { FloatingLogo } from '@/components/ui/FloatingLogo'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -249,6 +250,8 @@ export function LandingPage() {
 
       {/* ── SECTION 1: The Hook ──────────────────────────── */}
       <section className="lp-hero">
+        <FloatingLogo />
+
         {/* Top-left serif label */}
         <p className="lp-hero-label">
           <em>Arquetipo</em>

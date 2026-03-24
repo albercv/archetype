@@ -28,6 +28,7 @@ export const metadata: Metadata = {
   title: 'Test de Arquetipos Masculinos',
   description:
     '12 preguntas. Tu verdad. Sin filtros. Descubre tu arquetipo masculino dominante.',
+  icons: { icon: '/images/favicon.png' },
   openGraph: {
     title: 'Test de Arquetipos Masculinos',
     description: '12 preguntas. Tu verdad. Sin filtros.',

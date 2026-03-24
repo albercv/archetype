@@ -3,6 +3,7 @@
 import { use, useEffect, useState, useRef, type CSSProperties } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { FloatingLogo } from '@/components/ui/FloatingLogo'
 
 interface ArchetypeEntry {
   id: string
@@ -972,7 +973,15 @@ export default function ReportPage({ params }: { params: Promise<{ sessionId: st
     }
   }, [sessionId])
 
-  if (status === 'TIMEOUT' || status === 'FAILED') return <TimeoutScreen />
-  if (status === 'COMPLETED' && report) return <ReportView report={report} />
-  return <LoadingScreen />
+  const screen =
+    status === 'TIMEOUT' || status === 'FAILED' ? <TimeoutScreen /> :
+    status === 'COMPLETED' && report ? <ReportView report={report} /> :
+    <LoadingScreen />
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <FloatingLogo />
+      {screen}
+    </div>
+  )
 }
