@@ -4,6 +4,7 @@ import { scoreArchetypes, type Answer } from '@/lib/services/archetype-scorer'
 import { QUESTIONS } from '@/lib/data/questions'
 import { ARCHETYPES } from '@/lib/data/archetypes'
 import { type Prisma } from '@prisma/client'
+import { sendReportEmail } from '@/lib/services/email'
 
 const SYSTEM_PROMPT = `Eres un experto en psicología arquetipal masculina basada en el modelo de 12 arquetipos (Jung, Moore/Gillette).
 
@@ -111,4 +112,10 @@ export async function generateReport(sessionId: string): Promise<void> {
     completedAt: new Date(),
   })
   console.log('[REPORT] Generation complete for session:', sessionId)
+
+  if (session.email) {
+    console.log('[EMAIL] Sending report to:', session.email)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await sendReportEmail(session.email, report as any)
+  }
 }
