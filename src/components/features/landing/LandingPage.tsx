@@ -328,7 +328,7 @@ export function LandingPage() {
           {ARCHETYPES.map(({ id, name, tall, img, shortDescription }) => (
             <div
               key={id}
-              className={`archetype-item${tall ? ' archetype-item--tall' : ''}`}
+              className={`archetype-item${tall ? ' archetype-item--tall' : ''}${expandedId === id ? ' archetype-item--expanded' : ''}`}
               onClick={
                 isMobile
                   ? () => setExpandedId((prev) => (prev === id ? null : id))
@@ -336,7 +336,7 @@ export function LandingPage() {
               }
               style={isMobile ? { cursor: 'pointer' } : undefined}
             >
-              {/* Image + name inside overflow-hidden inner */}
+              {/* Image, name, and tooltip — all inside overflow-hidden inner */}
               <div className="archetype-item-inner">
                 <Image
                   src={img}
@@ -349,14 +349,12 @@ export function LandingPage() {
                 />
                 <span className="archetype-item-name">{name}</span>
 
-                {/* Mobile expand: shows on tap inside the item */}
-                {isMobile && expandedId === id && (
-                  <div className="archetype-expand-text">{shortDescription}</div>
-                )}
+                {/* Tooltip: CSS hover on desktop, tap-toggle on mobile */}
+                <div className="archetype-tooltip">
+                  <p className="archetype-tooltip-name">{name}</p>
+                  <p className="archetype-tooltip-desc">{shortDescription}</p>
+                </div>
               </div>
-
-              {/* Desktop tooltip: overflows the item (CSS hover) */}
-              <div className="archetype-tooltip">{shortDescription}</div>
             </div>
           ))}
         </div>

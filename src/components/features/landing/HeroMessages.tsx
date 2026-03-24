@@ -13,6 +13,18 @@ function pickNext(exclude: number): number {
   return idx
 }
 
+function buildShuffleRanks(len: number): number[] {
+  // Create a random permutation: ranks[i] = dissolution delay rank for char i
+  const indices = Array.from({ length: len }, (_, i) => i)
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const tmp = indices[i]!
+    indices[i] = indices[j]!
+    indices[j] = tmp
+  }
+  return indices
+}
+
 export function HeroMessages({ reduced }: { reduced: boolean }) {
   const [msgIdx, setMsgIdx] = useState(() =>
     Math.floor(Math.random() * HERO_MESSAGES.length),
@@ -20,6 +32,8 @@ export function HeroMessages({ reduced }: { reduced: boolean }) {
   const [phase, setPhase] = useState<Phase>('typing')
   const [typedCount, setTypedCount] = useState(0)
   const prevIdx = useRef(msgIdx)
+  // shuffleRanks[charIndex] = delay rank (0 = first to dissolve)
+  const shuffleRanks = useRef<number[]>([])
 
   const msg = HERO_MESSAGES[msgIdx] ?? ''
   const len = msg.length
@@ -41,18 +55,20 @@ export function HeroMessages({ reduced }: { reduced: boolean }) {
     return () => clearInterval(id)
   }, [phase, msgIdx, reduced, len])
 
-  // Paused → dissolve
+  // Paused → dissolve (generate shuffle order before transitioning)
   useEffect(() => {
     if (phase !== 'paused' || reduced) return
-    const id = setTimeout(() => setPhase('dissolving'), 2000)
+    const id = setTimeout(() => {
+      shuffleRanks.current = buildShuffleRanks(len)
+      setPhase('dissolving')
+    }, 2000)
     return () => clearTimeout(id)
-  }, [phase, reduced])
+  }, [phase, reduced, len])
 
-  // Dissolve → wait
+  // Dissolve → wait (0.6s transition + stagger + 0.3s pause)
   useEffect(() => {
     if (phase !== 'dissolving') return
-    // last char finishes at: delay(len-1)*0.03s + 0.3s transition
-    const ms = (len - 1) * 30 + 350
+    const ms = (len - 1) * 30 + 600 + 300
     const id = setTimeout(() => setPhase('waiting'), ms)
     return () => clearTimeout(id)
   }, [phase, len])
@@ -66,7 +82,7 @@ export function HeroMessages({ reduced }: { reduced: boolean }) {
       setMsgIdx(next)
       setTypedCount(0)
       setPhase('typing')
-    }, 500)
+    }, 100)
     return () => clearTimeout(id)
   }, [phase])
 
@@ -82,21 +98,34 @@ export function HeroMessages({ reduced }: { reduced: boolean }) {
   return (
     <div style={{ textAlign: 'center', width: '100%' }}>
       <h1 className="lp-question" aria-label={msg} style={{ marginBottom: '1.5rem' }}>
-        {msg.split('').map((ch, i) => (
-          <span
-            key={`${msgIdx}-${i}`}
-            className="tw-char"
-            aria-hidden="true"
-            style={{
-              opacity: isDissolving ? 0 : reduced || typedCount > i ? 1 : 0,
-              transition: isDissolving
-                ? `opacity 0.3s ease ${i * 0.03}s`
-                : 'opacity 0.04s',
-            }}
-          >
-            {ch === ' ' ? '\u00A0' : ch}
-          </span>
-        ))}
+        {msg.split('').map((ch, i) => {
+          const rank = shuffleRanks.current[i] ?? i
+          const delay = `${(rank * 0.03).toFixed(2)}s`
+          return (
+            <span
+              key={`${msgIdx}-${i}`}
+              className="tw-char"
+              aria-hidden="true"
+              style={
+                isDissolving
+                  ? {
+                      opacity: 0,
+                      transform: 'translateY(-20px)',
+                      filter: 'blur(4px)',
+                      transition: `opacity 0.6s ease ${delay}, transform 0.6s ease ${delay}, filter 0.6s ease ${delay}`,
+                    }
+                  : {
+                      opacity: reduced || typedCount > i ? 1 : 0,
+                      transform: 'translateY(0)',
+                      filter: 'blur(0px)',
+                      transition: 'opacity 0.04s',
+                    }
+              }
+            >
+              {ch === ' ' ? '\u00A0' : ch}
+            </span>
+          )
+        })}
         {(phase === 'typing' || phase === 'paused') && !reduced && (
           <span className="tw-cursor" aria-hidden="true" />
         )}

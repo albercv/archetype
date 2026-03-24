@@ -135,15 +135,19 @@ body {
 .lp-question {
   font-family: var(--font-space), sans-serif;
   font-weight: 700;
-  font-size: clamp(3rem, 8vw, 8rem);
+  font-size: clamp(1.5rem, 4.5vw, 3.5rem);
   color: var(--text-primary);
   letter-spacing: -0.02em;
   line-height: 1;
   text-align: center;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 90vw;
+  max-width: 100%;
 }
 
 .tw-char {
@@ -383,54 +387,58 @@ body {
   z-index: 50;
 }
 
-/* Desktop tooltip */
+/* Tooltip — overlays image from bottom, inside item-inner */
 .archetype-tooltip {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  background: #1c1b1b;
-  border: 1px solid rgba(164, 140, 122, 0.3);
-  padding: 12px 16px;
-  font-family: var(--font-inter), sans-serif;
-  font-size: 13px;
-  font-weight: 400;
-  color: #aaaaaa;
-  line-height: 1.5;
-  z-index: 100;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 0.15s ease, transform 0.15s ease;
-  pointer-events: none;
-  max-width: 280px;
-  width: max-content;
-}
-
-.archetype-item:hover .archetype-tooltip {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Mobile expand text (inside item-inner, shown on tap) */
-.archetype-expand-text {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(28, 27, 27, 0.93);
+  background: rgba(5, 5, 5, 0.85);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: 16px;
   border-top: 1px solid rgba(164, 140, 122, 0.3);
-  padding: 0.75rem;
-  font-family: var(--font-inter), sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  color: #999;
-  line-height: 1.5;
-  z-index: 5;
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
 }
 
-/* Hide desktop tooltip on touch devices */
-@media (hover: none) {
+.archetype-item:hover .archetype-tooltip,
+.archetype-item--expanded .archetype-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.archetype-tooltip-name {
+  font-family: var(--font-space), sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #f0ede6;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: 0.05em;
+}
+
+.archetype-tooltip-desc {
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: #aaaaaa;
+  line-height: 1.5;
+  margin: 4px 0 0;
+}
+
+@media (max-width: 768px) {
   .archetype-tooltip {
-    display: none;
+    padding: 12px;
+  }
+  .archetype-tooltip-name {
+    font-size: 12px;
+  }
+  .archetype-tooltip-desc {
+    font-size: 11px;
   }
 }
 
@@ -570,6 +578,17 @@ body {
 }
 
 /* ─── Responsive ────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .lp-question {
+    font-size: clamp(1.2rem, 5vw, 2rem);
+    white-space: normal;
+    flex-wrap: wrap;
+    text-wrap: balance;
+    padding: 0 1.5rem;
+    width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   .lp-s2 {
     grid-template-columns: 1fr;
