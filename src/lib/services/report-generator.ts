@@ -92,10 +92,11 @@ export async function generateReport(sessionId: string): Promise<void> {
     throw error
   }
 
-  const text = response.content[0]?.type === 'text' ? response.content[0].text : ''
+  let rawText = response.content[0]?.type === 'text' ? response.content[0].text : ''
+  rawText = rawText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
   let report: Prisma.InputJsonValue
   try {
-    report = JSON.parse(text) as Prisma.InputJsonValue
+    report = JSON.parse(rawText) as Prisma.InputJsonValue
   } catch (err) {
     const error = err instanceof Error ? err : new Error(String(err))
     console.error('[REPORT] JSON parse error:', error.message)
