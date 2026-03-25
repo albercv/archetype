@@ -211,6 +211,7 @@ export function HeroMessages({ reduced }: { reduced: boolean }) {
         </h1>
 
         <p
+          className="shimmer"
           style={{
             fontFamily: 'var(--font-inter), sans-serif',
             fontWeight: 400,
@@ -218,8 +219,8 @@ export function HeroMessages({ reduced }: { reduced: boolean }) {
             color: '#555',
             letterSpacing: '0.03em',
             lineHeight: 1.5,
-            maxWidth: '420px',
-            margin: '0 auto',
+            maxWidth: '80%',
+            margin: '3rem auto 0',
           }}
         >
           La mayoría de hombres viven con un arquetipo que no conocen.

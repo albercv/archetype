@@ -363,7 +363,7 @@ export function LandingPage() {
           ))}
         </div>
 
-        <p className="s3-footnote">
+        <p className="s3-footnote shimmer">
           <em>Uno de ellos te domina.</em>
         </p>
       </section>
