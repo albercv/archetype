@@ -129,6 +129,7 @@ body {
   padding: 2rem;
   position: relative;
   z-index: 2;
+  margin: 0 auto;
 }
 
 /* Typewriter question */
@@ -138,7 +139,6 @@ body {
   font-size: clamp(1.5rem, 4.5vw, 3.5rem);
   color: var(--text-primary);
   letter-spacing: -0.02em;
-  line-height: 1;
   text-align: center;
   display: flex;
   align-items: center;
@@ -148,6 +148,7 @@ body {
   overflow: hidden;
   width: 90vw;
   max-width: 100%;
+  margin: 0 auto;
 }
 
 .tw-char {
@@ -285,7 +286,6 @@ body {
 
 .lp-hero-cta-btn {
   display: inline-block;
-  border: 1px solid var(--text-primary);
   padding: 0.9rem 2.5rem;
   text-decoration: none;
   font-family: var(--font-space), sans-serif;
@@ -297,48 +297,46 @@ body {
   background: transparent;
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+  transition: background 0.1s ease, color 0.1s ease;
 }
 
 .lp-hero-cta-btn::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background: var(--text-primary);
-  transform: translateX(-101%);
-  transition: transform 0.15s ease;
-  z-index: 0;
-}
-
-.lp-hero-cta-btn:hover::before {
-  transform: translateX(0);
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: conic-gradient(from 0deg, transparent 70%, rgba(240,237,230,0.5) 85%, rgba(240,237,230,0.9) 90%, rgba(240,237,230,0.5) 95%, transparent 100%);
+  animation: border-rotate 3s linear infinite;
+  transition: opacity 0.1s ease;
+  z-index: -1;
 }
 
 .lp-hero-cta-btn::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent 0%, rgba(240,237,230,0.12) 40%, rgba(240,237,230,0.18) 50%, rgba(240,237,230,0.12) 60%, transparent 100%);
-  animation: shimmer 4s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 1;
+  inset: 1px;
+  background: #050505;
+  transition: opacity 0.1s ease;
+  z-index: -1;
 }
 
+.lp-hero-cta-btn:hover {
+  background: var(--text-primary);
+  color: var(--void);
+}
+
+.lp-hero-cta-btn:hover::before,
 .lp-hero-cta-btn:hover::after {
   opacity: 0;
 }
 
 .lp-hero-cta-btn span {
   position: relative;
-  z-index: 2;
-  transition: color 0.15s ease;
+  z-index: 1;
   display: inline-block;
-}
-
-.lp-hero-cta-btn:hover span {
-  color: var(--void);
 }
 
 .lp-hero-cta-meta {
@@ -537,7 +535,7 @@ body {
   display: inline-block;
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--text-primary);
+  isolation: isolate;
   padding: 1.1rem 3.25rem;
   text-decoration: none;
   font-family: var(--font-space), sans-serif;
@@ -546,48 +544,46 @@ body {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--text-primary);
+  background: transparent;
+  transition: background 0.1s ease, color 0.1s ease;
 }
 
 .s4-btn::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background: var(--text-primary);
-  transform: translateX(-101%);
-  transition: transform 0.15s ease;
-  z-index: 0;
-}
-
-.s4-btn:hover::before {
-  transform: translateX(0);
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: conic-gradient(from 0deg, transparent 70%, rgba(240,237,230,0.5) 85%, rgba(240,237,230,0.9) 90%, rgba(240,237,230,0.5) 95%, transparent 100%);
+  animation: border-rotate 3s linear infinite;
+  transition: opacity 0.1s ease;
+  z-index: -1;
 }
 
 .s4-btn::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent 0%, rgba(240,237,230,0.12) 40%, rgba(240,237,230,0.18) 50%, rgba(240,237,230,0.12) 60%, transparent 100%);
-  animation: shimmer 4s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 1;
+  inset: 1px;
+  background: #050505;
+  transition: opacity 0.1s ease;
+  z-index: -1;
 }
 
+.s4-btn:hover {
+  background: var(--text-primary);
+  color: var(--void);
+}
+
+.s4-btn:hover::before,
 .s4-btn:hover::after {
   opacity: 0;
 }
 
 .s4-btn span {
   position: relative;
-  z-index: 2;
-  transition: color 0.15s ease;
+  z-index: 1;
   display: inline-block;
-}
-
-.s4-btn:hover span {
-  color: var(--void);
 }
 
 .s4-small {
@@ -673,9 +669,15 @@ body {
     animation: none;
   }
 
-  .s4-btn::before,
-  .s4-btn span {
+  .lp-hero-cta-btn,
+  .s4-btn {
+    border: 1px solid rgba(240, 237, 230, 0.4);
     transition: none;
+  }
+
+  .lp-hero-cta-btn::before,
+  .s4-btn::before {
+    animation: none;
   }
 
   .s3-title,
@@ -686,10 +688,16 @@ body {
   }
 }
 
+/* ── Border-rotate keyframe ─────────────────────────────────── */
+@keyframes border-rotate {
+  to { transform: rotate(360deg); }
+}
+
 /* ── Shimmer ────────────────────────────────────────────────── */
 .shimmer {
   position: relative;
   overflow: hidden;
+  display: inline-block;
 }
 
 .shimmer::after {
@@ -711,9 +719,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .shimmer::after,
-  .lp-hero-cta-btn::after,
-  .s4-btn::after {
+  .shimmer::after {
     animation: none;
   }
 }

@@ -220,7 +220,7 @@ export function HeroMessages({ reduced }: { reduced: boolean }) {
             letterSpacing: '0.03em',
             lineHeight: 1.5,
             maxWidth: '80%',
-            margin: '3rem auto 0',
+            margin: '1.5rem auto 0',
           }}
         >
           La mayoría de hombres viven con un arquetipo que no conocen.

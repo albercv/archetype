@@ -363,9 +363,11 @@ export function LandingPage() {
           ))}
         </div>
 
-        <p className="s3-footnote shimmer">
-          <em>Uno de ellos te domina.</em>
-        </p>
+        <div style={{ textAlign: 'center' }}>
+          <p className="s3-footnote shimmer">
+            <em>Uno de ellos te domina.</em>
+          </p>
+        </div>
       </section>
 
       {/* ── SECTION 4: The CTA ────────────────────────────── */}
